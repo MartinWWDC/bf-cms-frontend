@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
-import { initials } from "@/features/resources/format";
+import { initials } from "@/lib/format";
 import { useMe } from "@/features/session/queries";
 
 const notConnected = (label: string) => () => toast.info(`"${label}" is not connected yet`);

@@ -8,12 +8,12 @@ import { DataTablePagination } from "@/components/data-table/data-table-paginati
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getApiErrorMessage } from "@/lib/api/client";
+import { formatNumber } from "@/lib/format";
 
-import { formatNumber } from "../format";
 import { useResourceContract, useResourceRecords } from "../queries";
-import { buildDefaultVisibility, buildResourceColumns, getListFields } from "../resource-columns";
+import { buildDefaultVisibility, buildResourceColumns, getListFields } from "../lib/resource-columns";
 import type { ListParams, ResourceContract, ResourceRecord } from "../types";
-import { PAGE_SIZES, useListState } from "../use-list-state";
+import { PAGE_SIZES, useListState } from "../hooks/use-list-state";
 import { RecordDrawer } from "./record-drawer";
 import { ResourceToolbar } from "./resource-toolbar";
 

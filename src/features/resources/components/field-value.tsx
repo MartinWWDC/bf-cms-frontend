@@ -1,7 +1,7 @@
 import { EyeOffIcon } from "lucide-react";
 import { cn } from "cn";
 
-import { formatCountry, formatDate, formatMoney, formatNumber, formatTime, initials } from "../format";
+import { formatCountry, formatDate, formatMoney, formatNumber, formatTime, initials } from "@/lib/format";
 import type { FieldDefinition, MoneyValue, PersonValue } from "../types";
 import { StatusBadge } from "./status-badge";
 

@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { ConstructionIcon } from "lucide-react";
 
 import { buttonVariants } from "@/components/ui/button";
-import { findNavLabel } from "@/features/navigation/navigation-utils";
+import { findNavLabel } from "@/features/navigation/lib/navigation-utils";
 import { useNavigation } from "@/features/navigation/queries";
 
 /** Placeholder for menu entries whose screen is not built yet. */

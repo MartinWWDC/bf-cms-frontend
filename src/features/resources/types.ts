@@ -138,3 +138,15 @@ export interface RecordDetail {
   version: number;
   activity: ActivityEntry[];
 }
+
+export interface RunActionInput {
+  recordId: string;
+  actionKey: string;
+  /** Mandatory for dangerous and money actions. */
+  reason?: string;
+}
+
+export interface RunActionResult {
+  /** Message from the backend, already translated. */
+  message: string;
+}

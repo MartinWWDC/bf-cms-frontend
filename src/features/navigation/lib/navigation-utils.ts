@@ -1,4 +1,4 @@
-import type { NavGroup, NavItem } from "./types";
+import type { NavGroup, NavItem } from "../types";
 
 function normalize(value: string) {
   return value.trim().toLowerCase();

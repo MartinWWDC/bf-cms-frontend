@@ -1,10 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { fetchNavigation } from "./api";
-
-export const navigationKeys = {
-  all: ["navigation"] as const,
-};
+import { fetchNavigation } from "../api/navigation.api";
+import { navigationKeys } from "./keys";
 
 export function useNavigation() {
   return useQuery({

@@ -3,7 +3,7 @@
 import { useCallback, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 
-import type { ListParams, SortRule } from "./types";
+import type { ListParams, SortRule } from "../types";
 
 export const PAGE_SIZES = [25, 50, 100] as const;
 const DEFAULT_PAGE_SIZE = PAGE_SIZES[0];

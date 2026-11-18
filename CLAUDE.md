@@ -6,7 +6,7 @@
 
 `bf-cms-frontend` is the internal CMS / admin frontend for BikeFlip, a used bike marketplace (bikes, components, clothing). It is used by staff, not by the public. It deploys to Vercel from `main`.
 
-The project is at the initial-setup stage: the stack is installed but there are no real screens, auth or resource modules yet.
+The project is at an early stage: the app shell and a generic resource screen exist and run on mock data. There is no auth and no real API connection yet.
 
 ## Related projects
 
@@ -49,6 +49,25 @@ Environment variables are listed in `.env.example`.
 
 More specific conventions live in `.claude/rules/` and load when matching files are touched.
 
+## Structure
+
+```
+src/
+  app/(cms)/            signed-in routes, wrapped in the app shell. Login will live outside this group.
+  components/ui/        shadcn primitives (generated)
+  components/layout/    app shell: header, sidebar, menu search, user menu
+  components/data-table/ generic TanStack Table (presentation only, knows nothing about resources)
+  features/<feature>/   types.ts, api/, queries/, mutations/, hooks/, lib/, components/
+  lib/                  API client, query client, formatting
+  mocks/                mock data, used only by features' api/ files
+```
+
+- `features/resources` is the generic, contract-driven screen: `ResourceView` renders the list, toolbar, paging and detail drawer for any resource from its contract. `(cms)/page.tsx` shows it for the mock `orders` resource.
+- `features/navigation` and `features/session` feed the sidebar and the user menu.
+- **Everything is mocked for now.** The shapes in each feature's `types.ts` are provisional placeholders, not the real contract. Each mocked function in `features/*/api/` is marked `MOCK`.
+- List state (page, sort, search, tab, open record) lives in the URL: `features/resources/hooks/use-list-state.ts`.
+- Theme: an ink frame (header + sidebar) around a paper content sheet; BikeFlip coral (`--brand`) is a signal colour only. Tokens are in `src/app/globals.css`.
+
 ## Commands
 
 ```sh
@@ -63,6 +82,7 @@ npm run lint     # eslint
 - Check how the codebase already does something before adding a new pattern or abstraction.
 - Keep changes minimal and scoped: no cleanup or refactors unless asked.
 - Do not add a dependency without asking; the stack is chosen deliberately.
+- **Required: the feature folder layout.** All domain code goes in `src/features/<feature>/` with `api/`, `queries/`, `mutations/`, `hooks/`, `lib/`, `components/` and `types.ts`. Read hooks (`useQuery`) go in `queries/` and write hooks (`useMutation`) in `mutations/`, never in the same folder or file; one hook per file; query keys only from `queries/keys.ts`; only `api/` talks to the backend. The full rules are in `.claude/rules/features.md` — read it before adding or moving anything under `src/features/`. Do not add a query or mutation anywhere else.
 - Server Components by default; add `'use client'` only where interactivity needs it.
 - Never commit `.env*` files or secrets.
 - Commit or push only when asked. `main` deploys to Vercel.

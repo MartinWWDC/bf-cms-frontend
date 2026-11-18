@@ -19,8 +19,8 @@ import {
   SidebarMenuSubItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { getNavIcon } from "@/features/navigation/nav-icons";
-import { filterNavigation, isHrefActive, isItemActive } from "@/features/navigation/navigation-utils";
+import { getNavIcon } from "@/features/navigation/lib/nav-icons";
+import { filterNavigation, isHrefActive, isItemActive } from "@/features/navigation/lib/navigation-utils";
 import { useNavigation } from "@/features/navigation/queries";
 import type { NavItem } from "@/features/navigation/types";
 

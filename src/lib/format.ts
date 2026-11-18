@@ -1,4 +1,4 @@
-import type { MoneyValue } from "./types";
+import type { MoneyValue } from "@/features/resources/types";
 
 /**
  * Display formatting. The locale is fixed for now; it will follow the admin's interface

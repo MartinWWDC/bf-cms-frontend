@@ -2,8 +2,8 @@ import type { ColumnVisibilityState } from "@tanstack/react-table";
 
 import type { DataTableColumn, DataTableColumnMeta } from "@/components/data-table/table-features";
 
-import { FieldValue } from "./components/field-value";
-import type { FieldDefinition, ResourceContract, ResourceRecord } from "./types";
+import { FieldValue } from "../components/field-value";
+import type { FieldDefinition, ResourceContract, ResourceRecord } from "../types";
 
 const RIGHT_ALIGNED: ReadonlySet<FieldDefinition["type"]> = new Set(["money", "number"]);
 

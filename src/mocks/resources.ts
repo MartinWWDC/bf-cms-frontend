@@ -4,6 +4,8 @@ import type {
   RecordDetail,
   ResourceContract,
   ResourceRecord,
+  RunActionInput,
+  RunActionResult,
 } from "@/features/resources/types";
 
 import { buildOrderActivity, mockOrders, ordersContract, ordersTabStatuses } from "./orders";
@@ -95,4 +97,15 @@ export function mockGetRecord(resource: string, id: string): RecordDetail {
   const record = records.find((entry) => entry.id === id);
   if (!record) throw new Error(`Record "${id}" not found`);
   return { record, version: 1, activity: buildActivity(record) };
+}
+
+/** Pretends to run an action. It validates the input like the backend would, but changes nothing. */
+export function mockRunAction(resource: string, input: RunActionInput): RunActionResult {
+  const { contract, records } = getResource(resource);
+  const action = contract.actions.find((entry) => entry.key === input.actionKey);
+  if (!action) throw new Error(`Unknown action "${input.actionKey}"`);
+  if (!records.some((entry) => entry.id === input.recordId)) {
+    throw new Error(`Record "${input.recordId}" not found`);
+  }
+  return { message: `"${action.label}" ran against mock data. Nothing was changed.` };
 }

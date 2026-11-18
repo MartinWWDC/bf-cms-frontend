@@ -22,10 +22,12 @@ import {
 } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { getApiErrorMessage } from "@/lib/api/client";
+import { formatDate, formatTime } from "@/lib/format";
 
-import { formatDate, formatTime } from "../format";
+import { useRunRecordAction } from "../mutations";
 import { useResourceRecord } from "../queries";
-import { getField } from "../resource-columns";
+import { getField } from "../lib/resource-columns";
 import type {
   ActionDefinition,
   ActivityEntry,
@@ -99,6 +101,8 @@ function RecordContent({ contract, record, activity, isLoadingDetail }: RecordCo
   const highlights = (contract.detail.highlights ?? [])
     .map((key) => getField(contract, key))
     .filter((field): field is FieldDefinition => field !== undefined);
+  const everydayActions = contract.actions.filter((action) => action.tone !== "danger");
+  const dangerActions = contract.actions.filter((action) => action.tone === "danger");
 
   return (
     <>
@@ -119,13 +123,13 @@ function RecordContent({ contract, record, activity, isLoadingDetail }: RecordCo
 
       <div className="scrollbar-slim min-h-0 flex-1 overflow-y-auto">
         {highlights.length > 0 ? (
-          <dl className="grid grid-cols-1 divide-y border-b sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+          <dl className="grid grid-cols-3 divide-x border-b">
             {highlights.map((field) => (
-              <div key={field.key} className="flex flex-col gap-1.5 px-5 py-4 sm:px-7">
+              <div key={field.key} className="flex min-w-0 flex-col gap-1.5 px-3 py-4 first:pl-5 sm:px-7 sm:first:pl-7">
                 <dt className="font-mono text-[0.6875rem] tracking-wider text-muted-foreground uppercase">
                   {field.label}
                 </dt>
-                <dd className="text-lg font-medium [&_.font-mono]:text-lg">
+                <dd className="text-base font-medium sm:text-lg [&_.font-mono]:text-base sm:[&_.font-mono]:text-lg">
                   <FieldValue field={field} value={record[field.key]} variant="detail" />
                 </dd>
               </div>
@@ -185,9 +189,15 @@ function RecordContent({ contract, record, activity, isLoadingDetail }: RecordCo
 
       {contract.actions.length > 0 ? (
         <footer className="flex shrink-0 flex-wrap items-center gap-2 border-t bg-muted/50 px-5 py-3 sm:px-7">
-          {contract.actions.map((action) => (
-            <ActionButton key={action.key} action={action} />
+          {everydayActions.map((action) => (
+            <ActionButton key={action.key} resource={contract.key} recordId={record.id} action={action} />
           ))}
+          {/* Dangerous actions sit apart on the right, away from the everyday ones. */}
+          <div className="flex flex-wrap items-center gap-2 sm:ml-auto">
+            {dangerActions.map((action) => (
+              <ActionButton key={action.key} resource={contract.key} recordId={record.id} action={action} />
+            ))}
+          </div>
         </footer>
       ) : null}
     </>
@@ -215,24 +225,36 @@ function DetailField({ field, value }: { field: FieldDefinition; value: unknown 
   );
 }
 
-function ActionButton({ action }: { action: ActionDefinition }) {
+interface ActionButtonProps {
+  resource: string;
+  recordId: string;
+  action: ActionDefinition;
+}
+
+function ActionButton({ resource, recordId, action }: ActionButtonProps) {
+  const runAction = useRunRecordAction(resource);
   const Icon = (action.icon && ACTION_ICONS[action.icon]) || CircleDotIcon;
   const isDanger = action.tone === "danger";
+
+  // TODO(actions): dangerous and money actions must first ask for a reason and a
+  // confirmation (and show risk flags). That dialog comes with the real action contract.
+  const handleClick = () =>
+    runAction.mutate(
+      { recordId, actionKey: action.key },
+      {
+        onSuccess: (result) => toast.success(result.message),
+        onError: (error) => toast.error(getApiErrorMessage(error)),
+      },
+    );
 
   return (
     <Button
       variant={isDanger ? "destructive" : "outline"}
-      // Dangerous actions sit apart on the right, away from the everyday ones.
-      className={isDanger ? "first-of-type:ml-auto" : "bg-card"}
-      onClick={() =>
-        toast.info(`"${action.label}" is not connected yet`, {
-          description: action.requiresReason
-            ? "It will ask for a reason and a confirmation before it runs."
-            : undefined,
-        })
-      }
+      className={isDanger ? undefined : "bg-card"}
+      disabled={runAction.isPending}
+      onClick={handleClick}
     >
-      <Icon />
+      <Icon className={runAction.isPending ? "animate-pulse" : undefined} />
       {action.label}
     </Button>
   );
