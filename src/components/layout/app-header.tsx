@@ -1,6 +1,7 @@
 "use client";
 
 import { PanelLeftIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 import { useSidebar } from "@/components/ui/sidebar";
@@ -17,6 +18,7 @@ const frameButtonClass =
  */
 export function AppHeader() {
   const { toggleSidebar } = useSidebar();
+  const t = useTranslations("shell");
 
   return (
     <header className="flex h-(--header-height) shrink-0 items-center gap-2 bg-sidebar px-3 text-sidebar-foreground">
@@ -24,7 +26,7 @@ export function AppHeader() {
         variant="ghost"
         size="icon"
         className={frameButtonClass}
-        aria-label="Toggle menu"
+        aria-label={t("toggleMenu")}
         onClick={toggleSidebar}
       >
         <PanelLeftIcon />
@@ -35,7 +37,7 @@ export function AppHeader() {
       <div className="ml-auto flex items-center gap-1">
         <span className="mr-1 hidden items-center gap-1.5 rounded-sm border border-sidebar-border px-2 py-1 font-mono text-[0.625rem] tracking-widest uppercase sm:flex">
           <span aria-hidden className="size-1.5 rounded-full bg-tone-warning" />
-          Mock data
+          {t("mockData")}
         </span>
         <ThemeToggle className={frameButtonClass} />
       </div>

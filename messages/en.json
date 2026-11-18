@@ -1,0 +1,66 @@
+{
+  "common": {
+    "tryAgain": "Try again",
+    "notConnected": "\"{label}\" is not connected yet"
+  },
+  "shell": {
+    "toggleMenu": "Toggle menu",
+    "mockData": "Mock data",
+    "toggleTheme": "Switch between light and dark theme",
+    "menuSearch": "Search menu",
+    "clearMenuSearch": "Clear menu search",
+    "menuLoadFailed": "The menu could not be loaded.",
+    "menuNoMatches": "Nothing in the menu matches <term>“{query}”</term>.",
+    "comingSoon": {
+      "title": "Not built yet",
+      "description": "This screen is not built yet. It will render from its resource contract, the same way Orders does.",
+      "back": "Back to Orders"
+    }
+  },
+  "userMenu": {
+    "profile": "Profile",
+    "language": "Language",
+    "sessions": "Sessions",
+    "signOut": "Sign out"
+  },
+  "table": {
+    "empty": "No records.",
+    "range": "<range>{from}–{to}</range> of {total}",
+    "rows": "Rows",
+    "rowsPerPage": "Rows per page",
+    "firstPage": "First page",
+    "previousPage": "Previous page",
+    "nextPage": "Next page",
+    "lastPage": "Last page"
+  },
+  "resources": {
+    "recordCount": "{count, plural, one {record} other {records}}",
+    "loadFailed": "This resource could not be loaded",
+    "recordsLoadFailed": "The records could not be loaded",
+    "emptyTitle": "Nothing matches this view",
+    "emptyHint": "Try another tab or a different search.",
+    "toolbar": {
+      "search": "Search",
+      "clearSearch": "Clear search",
+      "columns": "Columns",
+      "visibleColumns": "Visible columns",
+      "refresh": "Refresh",
+      "views": "Views"
+    },
+    "drawer": {
+      "description": "Details and actions for {type} {id}",
+      "tabDetails": "Details",
+      "tabActivity": "Activity",
+      "tabNotes": "Notes",
+      "notesEmptyTitle": "No notes yet",
+      "notesEmptyHint": "Notes are shared with every admin who can open this record.",
+      "activityEmpty": "No activity recorded.",
+      "reveal": "Reveal",
+      "revealNotConnected": "Revealing a masked value needs a permission and is logged. Not connected yet.",
+      "loadingTitle": "Loading record",
+      "loadingDescription": "The record is loading.",
+      "loadFailedTitle": "This record could not be loaded",
+      "loadFailedHint": "It may have been removed, or the request failed."
+    }
+  }
+}

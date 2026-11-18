@@ -2,6 +2,7 @@
 
 import { Suspense, useEffect, useRef, useState } from "react";
 import { SearchIcon, XIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import {
   Sidebar,
@@ -35,6 +36,7 @@ function isTypingTarget(target: EventTarget | null) {
  * "/" focuses the menu search from anywhere.
  */
 export function AppSidebar() {
+  const t = useTranslations("shell");
   const [query, setQuery] = useState("");
   const searchRef = useRef<HTMLInputElement>(null);
   const { isMobile, setOpen, setOpenMobile } = useSidebar();
@@ -76,14 +78,14 @@ export function AppSidebar() {
             onKeyDown={(event) => {
               if (event.key === "Escape") setQuery("");
             }}
-            placeholder="Search menu"
-            aria-label="Search menu"
+            placeholder={t("menuSearch")}
+            aria-label={t("menuSearch")}
             className="h-9 border-sidebar-border bg-sidebar-accent/60 pr-9 pl-8 text-sidebar-accent-foreground placeholder:text-sidebar-foreground/55 dark:bg-sidebar-accent/60 [&::-webkit-search-cancel-button]:hidden"
           />
           {query ? (
             <button
               type="button"
-              aria-label="Clear menu search"
+              aria-label={t("clearMenuSearch")}
               onClick={() => {
                 setQuery("");
                 searchRef.current?.focus();
@@ -102,9 +104,9 @@ export function AppSidebar() {
         {/* Collapsed to icons: a button that expands the sidebar and focuses the search. */}
         <SidebarMenu className="hidden group-data-[collapsible=icon]:flex">
           <SidebarMenuItem>
-            <SidebarMenuButton tooltip="Search menu" onClick={focusSearch}>
+            <SidebarMenuButton tooltip={t("menuSearch")} onClick={focusSearch}>
               <SearchIcon />
-              <span>Search menu</span>
+              <span>{t("menuSearch")}</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

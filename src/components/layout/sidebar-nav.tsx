@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronRightIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import {
@@ -45,6 +46,8 @@ interface SidebarNavProps {
 export function SidebarNav({ query }: SidebarNavProps) {
   const { data: navigation, isPending, isError, refetch } = useNavigation();
   const pathname = usePathname();
+  const t = useTranslations("shell");
+  const tCommon = useTranslations("common");
   const { isMobile, state, setOpen, setOpenMobile } = useSidebar();
   // Sections the admin opened or closed by hand. Until touched, a section is open when it
   // contains the current page.
@@ -57,9 +60,9 @@ export function SidebarNav({ query }: SidebarNavProps) {
   if (isError) {
     return (
       <div className="px-4 py-6 text-sm group-data-[collapsible=icon]:hidden">
-        <p>The menu could not be loaded.</p>
+        <p>{t("menuLoadFailed")}</p>
         <button type="button" onClick={() => refetch()} className="mt-1 underline underline-offset-4">
-          Try again
+          {tCommon("tryAgain")}
         </button>
       </div>
     );
@@ -76,7 +79,10 @@ export function SidebarNav({ query }: SidebarNavProps) {
   if (groups.length === 0) {
     return (
       <p className="px-4 py-6 text-sm text-sidebar-foreground/70 group-data-[collapsible=icon]:hidden">
-        Nothing in the menu matches <span className="text-sidebar-accent-foreground">“{trimmedQuery}”</span>.
+        {t.rich("menuNoMatches", {
+          query: trimmedQuery,
+          term: (chunks) => <span className="text-sidebar-accent-foreground">{chunks}</span>,
+        })}
       </p>
     );
   }

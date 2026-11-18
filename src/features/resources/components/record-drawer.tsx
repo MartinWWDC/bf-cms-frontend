@@ -10,6 +10,7 @@ import {
   StickyNoteIcon,
   Undo2Icon,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -22,8 +23,8 @@ import {
 } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useFormat } from "@/i18n/use-format";
 import { getApiErrorMessage } from "@/lib/api/client";
-import { formatDate, formatTime } from "@/lib/format";
 
 import { useRunRecordAction } from "../mutations";
 import { useResourceRecord } from "../queries";
@@ -80,7 +81,7 @@ export function RecordDrawer({ contract, recordId, listRecord, onClose }: Record
             isLoadingDetail={detail.isPending}
           />
         ) : detail.isError ? (
-          <DrawerMessage title="This record could not be loaded" onRetry={() => detail.refetch()} />
+          <DrawerMessage onRetry={() => detail.refetch()} />
         ) : (
           <DrawerSkeleton />
         )}
@@ -97,6 +98,7 @@ interface RecordContentProps {
 }
 
 function RecordContent({ contract, record, activity, isLoadingDetail }: RecordContentProps) {
+  const t = useTranslations("resources.drawer");
   const statusField = contract.statusField ? getField(contract, contract.statusField) : undefined;
   const highlights = (contract.detail.highlights ?? [])
     .map((key) => getField(contract, key))
@@ -117,7 +119,7 @@ function RecordContent({ contract, record, activity, isLoadingDetail }: RecordCo
           {String(record[contract.titleField] ?? record.id)}
         </SheetTitle>
         <SheetDescription className="sr-only">
-          Details and actions for {contract.labelSingular.toLowerCase()} {record.id}
+          {t("description", { type: contract.labelSingular, id: record.id })}
         </SheetDescription>
       </SheetHeader>
 
@@ -140,9 +142,9 @@ function RecordContent({ contract, record, activity, isLoadingDetail }: RecordCo
         <Tabs defaultValue="details" className="gap-0">
           <div className="sticky top-0 z-10 border-b bg-popover px-5 sm:px-7">
             <TabsList variant="line" className="h-11 gap-4 p-0">
-              <TabsTrigger value="details" className="flex-none px-0">Details</TabsTrigger>
-              <TabsTrigger value="activity" className="flex-none px-0">Activity</TabsTrigger>
-              <TabsTrigger value="notes" className="flex-none px-0">Notes</TabsTrigger>
+              <TabsTrigger value="details" className="flex-none px-0">{t("tabDetails")}</TabsTrigger>
+              <TabsTrigger value="activity" className="flex-none px-0">{t("tabActivity")}</TabsTrigger>
+              <TabsTrigger value="notes" className="flex-none px-0">{t("tabNotes")}</TabsTrigger>
             </TabsList>
           </div>
 
@@ -179,9 +181,9 @@ function RecordContent({ contract, record, activity, isLoadingDetail }: RecordCo
           </TabsContent>
 
           <TabsContent value="notes" className="px-5 py-10 text-center sm:px-7">
-            <p className="text-sm font-medium">No notes yet</p>
+            <p className="text-sm font-medium">{t("notesEmptyTitle")}</p>
             <p className="mt-1 text-sm text-muted-foreground">
-              Notes are shared with every admin who can open this record.
+              {t("notesEmptyHint")}
             </p>
           </TabsContent>
         </Tabs>
@@ -205,6 +207,8 @@ function RecordContent({ contract, record, activity, isLoadingDetail }: RecordCo
 }
 
 function DetailField({ field, value }: { field: FieldDefinition; value: unknown }) {
+  const t = useTranslations("resources.drawer");
+
   return (
     <div className="flex min-h-11 items-center justify-between gap-4 border-b border-dashed py-2">
       <dt className="shrink-0 text-sm text-muted-foreground">{field.label}</dt>
@@ -214,10 +218,10 @@ function DetailField({ field, value }: { field: FieldDefinition; value: unknown 
           <Button
             variant="ghost"
             size="xs"
-            onClick={() => toast.info("Revealing a masked value needs a permission and is logged. Not connected yet.")}
+            onClick={() => toast.info(t("revealNotConnected"))}
           >
             <EyeIcon />
-            Reveal
+            {t("reveal")}
           </Button>
         ) : null}
       </dd>
@@ -261,8 +265,11 @@ function ActionButton({ resource, recordId, action }: ActionButtonProps) {
 }
 
 function ActivityList({ entries }: { entries: ActivityEntry[] }) {
+  const t = useTranslations("resources.drawer");
+  const format = useFormat();
+
   if (entries.length === 0) {
-    return <p className="py-6 text-center text-sm text-muted-foreground">No activity recorded.</p>;
+    return <p className="py-6 text-center text-sm text-muted-foreground">{t("activityEmpty")}</p>;
   }
   return (
     <ol className="relative flex flex-col gap-5 before:absolute before:inset-y-1.5 before:left-[3px] before:w-px before:bg-border">
@@ -271,7 +278,7 @@ function ActivityList({ entries }: { entries: ActivityEntry[] }) {
           <span aria-hidden className="absolute top-1.5 left-0 size-[7px] rounded-full bg-foreground ring-4 ring-popover" />
           <p className="text-sm">{entry.summary}</p>
           <p className="mt-0.5 font-mono text-xs text-muted-foreground">
-            {entry.actor} · {formatDate(entry.at)} {formatTime(entry.at)}
+            {entry.actor} · {format.date(entry.at)} {format.time(entry.at)}
           </p>
         </li>
       ))}
@@ -280,11 +287,13 @@ function ActivityList({ entries }: { entries: ActivityEntry[] }) {
 }
 
 function DrawerSkeleton() {
+  const t = useTranslations("resources.drawer");
+
   return (
     <>
       <SheetHeader className="gap-3 border-b px-5 pt-5 pb-4 sm:px-7">
-        <SheetTitle className="sr-only">Loading record</SheetTitle>
-        <SheetDescription className="sr-only">The record is loading.</SheetDescription>
+        <SheetTitle className="sr-only">{t("loadingTitle")}</SheetTitle>
+        <SheetDescription className="sr-only">{t("loadingDescription")}</SheetDescription>
         <Skeleton className="h-4 w-40" />
         <Skeleton className="h-7 w-80 max-w-full" />
       </SheetHeader>
@@ -297,13 +306,16 @@ function DrawerSkeleton() {
   );
 }
 
-function DrawerMessage({ title, onRetry }: { title: string; onRetry: () => void }) {
+function DrawerMessage({ onRetry }: { onRetry: () => void }) {
+  const t = useTranslations("resources.drawer");
+  const tCommon = useTranslations("common");
+
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-center">
-      <SheetTitle>{title}</SheetTitle>
-      <SheetDescription>It may have been removed, or the request failed.</SheetDescription>
+      <SheetTitle>{t("loadFailedTitle")}</SheetTitle>
+      <SheetDescription>{t("loadFailedHint")}</SheetDescription>
       <Button variant="outline" onClick={onRetry}>
-        Try again
+        {tCommon("tryAgain")}
       </Button>
     </div>
   );

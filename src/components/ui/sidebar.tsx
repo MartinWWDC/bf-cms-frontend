@@ -163,6 +163,9 @@ function Sidebar({
   collapsible?: "offcanvas" | "icon" | "none"
 }) {
   const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
+  // On mobile, focus the sheet itself when it opens. The default (first focusable element)
+  // would focus the menu search and bring up the on-screen keyboard.
+  const mobileContentRef = React.useRef<HTMLDivElement>(null)
 
   if (collapsible === "none") {
     return (
@@ -194,12 +197,19 @@ function Sidebar({
             } as React.CSSProperties
           }
           side={side}
+          initialFocus={mobileContentRef}
         >
           <SheetHeader className="sr-only">
             <SheetTitle>Sidebar</SheetTitle>
             <SheetDescription>Displays the mobile sidebar.</SheetDescription>
           </SheetHeader>
-          <div className="flex h-full w-full flex-col">{children}</div>
+          <div
+            ref={mobileContentRef}
+            tabIndex={-1}
+            className="flex h-full w-full flex-col outline-none"
+          >
+            {children}
+          </div>
         </SheetContent>
       </Sheet>
     )

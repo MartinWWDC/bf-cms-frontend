@@ -1,7 +1,9 @@
 import { EyeOffIcon } from "lucide-react";
 import { cn } from "cn";
 
-import { formatCountry, formatDate, formatMoney, formatNumber, formatTime, initials } from "@/lib/format";
+import { useFormat } from "@/i18n/use-format";
+import { initials } from "@/lib/format";
+
 import type { FieldDefinition, MoneyValue, PersonValue } from "../types";
 import { StatusBadge } from "./status-badge";
 
@@ -33,6 +35,8 @@ function PersonAvatar({ name }: { name: string }) {
  * here, and every list and drawer picks it up.
  */
 export function FieldValue({ field, value, variant = "cell" }: FieldValueProps) {
+  const format = useFormat();
+
   if (value === null || value === undefined || value === "") return <Empty />;
 
   switch (field.type) {
@@ -45,17 +49,17 @@ export function FieldValue({ field, value, variant = "cell" }: FieldValueProps) 
     }
 
     case "money":
-      return <span className="font-mono text-[0.8125rem] tabular-nums">{formatMoney(value as MoneyValue)}</span>;
+      return <span className="font-mono text-[0.8125rem] tabular-nums">{format.money(value as MoneyValue)}</span>;
 
     case "number":
-      return <span className="font-mono text-[0.8125rem] tabular-nums">{formatNumber(Number(value))}</span>;
+      return <span className="font-mono text-[0.8125rem] tabular-nums">{format.number(Number(value))}</span>;
 
     case "datetime": {
       const iso = String(value);
       return (
         <time dateTime={iso} className="whitespace-nowrap">
-          {formatDate(iso)}
-          <span className="ml-1.5 font-mono text-xs text-muted-foreground tabular-nums">{formatTime(iso)}</span>
+          {format.date(iso)}
+          <span className="ml-1.5 font-mono text-xs text-muted-foreground tabular-nums">{format.time(iso)}</span>
         </time>
       );
     }
@@ -80,7 +84,7 @@ export function FieldValue({ field, value, variant = "cell" }: FieldValueProps) 
           <span className="rounded-sm border px-1 font-mono text-[0.625rem] font-medium text-muted-foreground">
             {code}
           </span>
-          {variant === "detail" ? formatCountry(code) : null}
+          {variant === "detail" ? format.country(code) : null}
         </span>
       );
     }

@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import type { ColumnVisibilityState } from "@tanstack/react-table";
 import { Columns3Icon, RotateCwIcon, SearchIcon, XIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { cn } from "cn";
 
 import { Button } from "@/components/ui/button";
@@ -40,27 +41,34 @@ export function ResourceToolbar({
   onTabChange,
   search,
   onSearchChange,
-  searchPlaceholder = "Search",
+  searchPlaceholder,
   columns,
   columnVisibility,
   onColumnVisibilityChange,
   onRefresh,
   isRefreshing,
 }: ResourceToolbarProps) {
+  const t = useTranslations("resources.toolbar");
+
   return (
     <div className="flex shrink-0 flex-col gap-3 border-b px-4 pt-1 sm:px-6">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-        <SearchField value={search} onChange={onSearchChange} placeholder={searchPlaceholder} />
+        <SearchField
+          value={search}
+          onChange={onSearchChange}
+          placeholder={searchPlaceholder ?? t("search")}
+          clearLabel={t("clearSearch")}
+        />
 
         <div className="flex items-center gap-2 sm:ml-auto">
           <DropdownMenu>
             <DropdownMenuTrigger render={<Button variant="outline" size="sm" />}>
               <Columns3Icon />
-              Columns
+              {t("columns")}
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-52">
               <DropdownMenuGroup>
-                <DropdownMenuLabel>Visible columns</DropdownMenuLabel>
+                <DropdownMenuLabel>{t("visibleColumns")}</DropdownMenuLabel>
                 {columns.map((column) => (
                   <DropdownMenuCheckboxItem
                     key={column.key}
@@ -79,13 +87,13 @@ export function ResourceToolbar({
 
           <Button variant="outline" size="sm" onClick={onRefresh} disabled={isRefreshing}>
             <RotateCwIcon className={cn(isRefreshing && "animate-spin")} />
-            Refresh
+            {t("refresh")}
           </Button>
         </div>
       </div>
 
       {tabs.length > 0 ? (
-        <div role="tablist" aria-label="Views" className="scrollbar-slim -mx-4 flex gap-1 overflow-x-auto px-4 sm:-mx-6 sm:px-6">
+        <div role="tablist" aria-label={t("views")} className="scrollbar-slim -mx-4 flex gap-1 overflow-x-auto px-4 sm:-mx-6 sm:px-6">
           {tabs.map((tab) => {
             const isActive = tab.key === activeTab;
             return (
@@ -115,13 +123,14 @@ interface SearchFieldProps {
   value: string;
   onChange: (value: string) => void;
   placeholder: string;
+  clearLabel: string;
 }
 
 /**
  * Search box that types instantly but reports changes debounced, so each keystroke does
  * not become a request. Remount it (via `key`) to reset it from outside.
  */
-function SearchField({ value, onChange, placeholder }: SearchFieldProps) {
+function SearchField({ value, onChange, placeholder, clearLabel }: SearchFieldProps) {
   const [draft, setDraft] = useState(value);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -149,7 +158,7 @@ function SearchField({ value, onChange, placeholder }: SearchFieldProps) {
       {draft ? (
         <button
           type="button"
-          aria-label="Clear search"
+          aria-label={clearLabel}
           onClick={() => commit("", true)}
           className="absolute top-1/2 right-1.5 flex size-5 -translate-y-1/2 items-center justify-center rounded-sm text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
         >

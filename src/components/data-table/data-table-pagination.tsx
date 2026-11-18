@@ -1,6 +1,7 @@
 "use client";
 
 import { ChevronLeftIcon, ChevronRightIcon, ChevronsLeftIcon, ChevronsRightIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -32,6 +33,7 @@ export function DataTablePagination({
   onPageSizeChange,
   disabled = false,
 }: DataTablePaginationProps) {
+  const t = useTranslations("table");
   const pageCount = Math.max(1, Math.ceil(total / pageSize));
   const from = total === 0 ? 0 : (page - 1) * pageSize + 1;
   const to = Math.min(total, page * pageSize);
@@ -41,21 +43,23 @@ export function DataTablePagination({
   return (
     <div className="flex shrink-0 flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t bg-card px-4 py-2">
       <p className="font-mono text-xs text-muted-foreground tabular-nums">
-        <span className="text-foreground">
-          {from}–{to}
-        </span>{" "}
-        of {total}
+        {t.rich("range", {
+          from,
+          to,
+          total,
+          range: (chunks) => <span className="text-foreground">{chunks}</span>,
+        })}
       </p>
 
       <div className="flex items-center gap-3">
         <div className="hidden items-center gap-2 sm:flex">
-          <span className="text-xs text-muted-foreground">Rows</span>
+          <span className="text-xs text-muted-foreground">{t("rows")}</span>
           <Select
             value={String(pageSize)}
             onValueChange={(value) => onPageSizeChange(Number(value))}
             disabled={disabled}
           >
-            <SelectTrigger size="sm" className="w-18 font-mono text-xs tabular-nums" aria-label="Rows per page">
+            <SelectTrigger size="sm" className="w-18 font-mono text-xs tabular-nums" aria-label={t("rowsPerPage")}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -73,7 +77,7 @@ export function DataTablePagination({
             variant="outline"
             size="icon-sm"
             className="hidden sm:inline-flex"
-            aria-label="First page"
+            aria-label={t("firstPage")}
             disabled={disabled || isFirst}
             onClick={() => onPageChange(1)}
           >
@@ -82,7 +86,7 @@ export function DataTablePagination({
           <Button
             variant="outline"
             size="icon-sm"
-            aria-label="Previous page"
+            aria-label={t("previousPage")}
             disabled={disabled || isFirst}
             onClick={() => onPageChange(page - 1)}
           >
@@ -94,7 +98,7 @@ export function DataTablePagination({
           <Button
             variant="outline"
             size="icon-sm"
-            aria-label="Next page"
+            aria-label={t("nextPage")}
             disabled={disabled || isLast}
             onClick={() => onPageChange(page + 1)}
           >
@@ -104,7 +108,7 @@ export function DataTablePagination({
             variant="outline"
             size="icon-sm"
             className="hidden sm:inline-flex"
-            aria-label="Last page"
+            aria-label={t("lastPage")}
             disabled={disabled || isLast}
             onClick={() => onPageChange(pageCount)}
           >

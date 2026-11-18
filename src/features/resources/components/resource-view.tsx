@@ -2,13 +2,14 @@
 
 import { useMemo, useState } from "react";
 import type { ColumnVisibilityState, OnChangeFn, SortingState } from "@tanstack/react-table";
+import { useTranslations } from "next-intl";
 
 import { DataTable } from "@/components/data-table/data-table";
 import { DataTablePagination } from "@/components/data-table/data-table-pagination";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useFormat } from "@/i18n/use-format";
 import { getApiErrorMessage } from "@/lib/api/client";
-import { formatNumber } from "@/lib/format";
 
 import { useResourceContract, useResourceRecords } from "../queries";
 import { buildDefaultVisibility, buildResourceColumns, getListFields } from "../lib/resource-columns";
@@ -36,12 +37,13 @@ interface ResourceViewProps {
  */
 export function ResourceView({ resource }: ResourceViewProps) {
   const contract = useResourceContract(resource);
+  const t = useTranslations("resources");
 
   if (contract.isPending) return <ResourceViewSkeleton />;
   if (contract.isError) {
     return (
       <ErrorState
-        title="This resource could not be loaded"
+        title={t("loadFailed")}
         message={getApiErrorMessage(contract.error)}
         onRetry={() => contract.refetch()}
       />
@@ -51,6 +53,8 @@ export function ResourceView({ resource }: ResourceViewProps) {
 }
 
 function ResourceList({ contract }: { contract: ResourceContract }) {
+  const t = useTranslations("resources");
+  const format = useFormat();
   const [listState, setListState] = useListState(contract.list.defaultSort);
   const { page, pageSize, sort, search, tab, recordId } = listState;
 
@@ -92,9 +96,9 @@ function ResourceList({ contract }: { contract: ResourceContract }) {
         </div>
         <p className="shrink-0 text-right font-mono text-xs tracking-wider text-muted-foreground uppercase">
           <span className="block font-heading text-2xl leading-none font-semibold tracking-tight text-foreground normal-case tabular-nums">
-            {records.isPending ? "–" : formatNumber(total)}
+            {records.isPending ? "–" : format.number(total)}
           </span>
-          {total === 1 ? "record" : "records"}
+          {t("recordCount", { count: total })}
         </p>
       </header>
 
@@ -114,7 +118,7 @@ function ResourceList({ contract }: { contract: ResourceContract }) {
 
       {records.isError ? (
         <ErrorState
-          title="The records could not be loaded"
+          title={t("recordsLoadFailed")}
           message={getApiErrorMessage(records.error)}
           onRetry={() => records.refetch()}
         />
@@ -135,8 +139,8 @@ function ResourceList({ contract }: { contract: ResourceContract }) {
           className="min-h-80"
           emptyState={
             <div>
-              <p className="text-sm font-medium">No {contract.label.toLowerCase()} match this view</p>
-              <p className="mt-1 text-sm text-muted-foreground">Try another tab or a different search.</p>
+              <p className="text-sm font-medium">{t("emptyTitle")}</p>
+              <p className="mt-1 text-sm text-muted-foreground">{t("emptyHint")}</p>
             </div>
           }
         />
@@ -180,12 +184,14 @@ export function ResourceViewSkeleton() {
 }
 
 function ErrorState({ title, message, onRetry }: { title: string; message: string; onRetry: () => void }) {
+  const t = useTranslations("common");
+
   return (
     <div className="flex min-h-64 flex-1 flex-col items-center justify-center gap-2 p-8 text-center">
       <p className="font-medium">{title}</p>
       <p className="max-w-md text-sm text-muted-foreground">{message}</p>
       <Button variant="outline" className="mt-2" onClick={onRetry}>
-        Try again
+        {t("tryAgain")}
       </Button>
     </div>
   );

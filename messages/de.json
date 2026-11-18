@@ -1,0 +1,66 @@
+{
+  "common": {
+    "tryAgain": "Erneut versuchen",
+    "notConnected": "„{label}“ ist noch nicht angebunden"
+  },
+  "shell": {
+    "toggleMenu": "Menü ein- oder ausblenden",
+    "mockData": "Testdaten",
+    "toggleTheme": "Zwischen hellem und dunklem Design wechseln",
+    "menuSearch": "Menü durchsuchen",
+    "clearMenuSearch": "Menüsuche löschen",
+    "menuLoadFailed": "Das Menü konnte nicht geladen werden.",
+    "menuNoMatches": "Kein Menüeintrag passt zu <term>„{query}“</term>.",
+    "comingSoon": {
+      "title": "Noch nicht gebaut",
+      "description": "Diese Ansicht ist noch nicht gebaut. Sie wird wie die Bestellungen aus ihrem Ressourcenvertrag erzeugt.",
+      "back": "Zurück zu den Bestellungen"
+    }
+  },
+  "userMenu": {
+    "profile": "Profil",
+    "language": "Sprache",
+    "sessions": "Sitzungen",
+    "signOut": "Abmelden"
+  },
+  "table": {
+    "empty": "Keine Einträge.",
+    "range": "<range>{from}–{to}</range> von {total}",
+    "rows": "Zeilen",
+    "rowsPerPage": "Zeilen pro Seite",
+    "firstPage": "Erste Seite",
+    "previousPage": "Vorherige Seite",
+    "nextPage": "Nächste Seite",
+    "lastPage": "Letzte Seite"
+  },
+  "resources": {
+    "recordCount": "{count, plural, one {Eintrag} other {Einträge}}",
+    "loadFailed": "Diese Ressource konnte nicht geladen werden",
+    "recordsLoadFailed": "Die Einträge konnten nicht geladen werden",
+    "emptyTitle": "Nichts passt zu dieser Ansicht",
+    "emptyHint": "Versuche einen anderen Tab oder eine andere Suche.",
+    "toolbar": {
+      "search": "Suchen",
+      "clearSearch": "Suche löschen",
+      "columns": "Spalten",
+      "visibleColumns": "Sichtbare Spalten",
+      "refresh": "Aktualisieren",
+      "views": "Ansichten"
+    },
+    "drawer": {
+      "description": "Details und Aktionen für {type} {id}",
+      "tabDetails": "Details",
+      "tabActivity": "Verlauf",
+      "tabNotes": "Notizen",
+      "notesEmptyTitle": "Noch keine Notizen",
+      "notesEmptyHint": "Notizen sind für alle Admins sichtbar, die diesen Eintrag öffnen können.",
+      "activityEmpty": "Kein Verlauf vorhanden.",
+      "reveal": "Anzeigen",
+      "revealNotConnected": "Das Anzeigen eines maskierten Werts erfordert eine Berechtigung und wird protokolliert. Noch nicht angebunden.",
+      "loadingTitle": "Eintrag wird geladen",
+      "loadingDescription": "Der Eintrag wird geladen.",
+      "loadFailedTitle": "Dieser Eintrag konnte nicht geladen werden",
+      "loadFailedHint": "Er wurde möglicherweise entfernt, oder die Anfrage ist fehlgeschlagen."
+    }
+  }
+}

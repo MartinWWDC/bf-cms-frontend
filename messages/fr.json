@@ -1,0 +1,66 @@
+{
+  "common": {
+    "tryAgain": "Réessayer",
+    "notConnected": "« {label} » n'est pas encore connecté"
+  },
+  "shell": {
+    "toggleMenu": "Afficher ou masquer le menu",
+    "mockData": "Données de test",
+    "toggleTheme": "Basculer entre le thème clair et le thème sombre",
+    "menuSearch": "Rechercher dans le menu",
+    "clearMenuSearch": "Effacer la recherche du menu",
+    "menuLoadFailed": "Le menu n'a pas pu être chargé.",
+    "menuNoMatches": "Aucune entrée du menu ne correspond à <term>« {query} »</term>.",
+    "comingSoon": {
+      "title": "Pas encore réalisé",
+      "description": "Cet écran n'est pas encore réalisé. Il sera généré à partir du contrat de la ressource, comme les Commandes.",
+      "back": "Retour aux Commandes"
+    }
+  },
+  "userMenu": {
+    "profile": "Profil",
+    "language": "Langue",
+    "sessions": "Sessions",
+    "signOut": "Se déconnecter"
+  },
+  "table": {
+    "empty": "Aucun enregistrement.",
+    "range": "<range>{from}–{to}</range> sur {total}",
+    "rows": "Lignes",
+    "rowsPerPage": "Lignes par page",
+    "firstPage": "Première page",
+    "previousPage": "Page précédente",
+    "nextPage": "Page suivante",
+    "lastPage": "Dernière page"
+  },
+  "resources": {
+    "recordCount": "{count, plural, one {enregistrement} other {enregistrements}}",
+    "loadFailed": "Cette ressource n'a pas pu être chargée",
+    "recordsLoadFailed": "Les enregistrements n'ont pas pu être chargés",
+    "emptyTitle": "Rien ne correspond à cette vue",
+    "emptyHint": "Essayez un autre onglet ou une autre recherche.",
+    "toolbar": {
+      "search": "Rechercher",
+      "clearSearch": "Effacer la recherche",
+      "columns": "Colonnes",
+      "visibleColumns": "Colonnes visibles",
+      "refresh": "Actualiser",
+      "views": "Vues"
+    },
+    "drawer": {
+      "description": "Détails et actions pour {type} {id}",
+      "tabDetails": "Détails",
+      "tabActivity": "Activité",
+      "tabNotes": "Notes",
+      "notesEmptyTitle": "Aucune note pour l'instant",
+      "notesEmptyHint": "Les notes sont partagées avec tous les admins qui peuvent ouvrir cet enregistrement.",
+      "activityEmpty": "Aucune activité enregistrée.",
+      "reveal": "Afficher",
+      "revealNotConnected": "Afficher une valeur masquée nécessite une autorisation et est journalisé. Pas encore connecté.",
+      "loadingTitle": "Chargement de l'enregistrement",
+      "loadingDescription": "L'enregistrement est en cours de chargement.",
+      "loadFailedTitle": "Cet enregistrement n'a pas pu être chargé",
+      "loadFailedHint": "Il a peut-être été supprimé, ou la requête a échoué."
+    }
+  }
+}

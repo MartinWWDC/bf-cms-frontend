@@ -44,6 +44,7 @@ The source of truth for shapes is `cms/docs` (`conventions.md`, `field-types.md`
 - TanStack Query v5 for server state; client and defaults in `src/lib/query-client.ts`, mounted in `src/components/providers.tsx`
 - TanStack Table **v9** for data tables. The API differs from v8 (`useTable`, `tableFeatures`, `table.FlexRender`); read `node_modules/@tanstack/react-table/skills/` before writing table code
 - Axios client for the CMS API in `src/lib/api/client.ts` (bearer token + `Accept-Language`, base `NEXT_PUBLIC_CMS_API_URL/cms/v1`)
+- next-intl for translations, used client-side without locale routing: messages in `messages/{en,de,it,es,fr}.json`, provider and helpers in `src/i18n/`
 
 Environment variables are listed in `.env.example`.
 
@@ -58,8 +59,10 @@ src/
   components/layout/    app shell: header, sidebar, menu search, user menu
   components/data-table/ generic TanStack Table (presentation only, knows nothing about resources)
   features/<feature>/   types.ts, api/, queries/, mutations/, hooks/, lib/, components/
-  lib/                  API client, query client, formatting
+  i18n/                 language config, provider, locale store, useFormat
+  lib/                  API client, query client, small helpers
   mocks/                mock data, used only by features' api/ files
+messages/               one JSON file per language; en.json is the source of truth
 ```
 
 - `features/resources` is the generic, contract-driven screen: `ResourceView` renders the list, toolbar, paging and detail drawer for any resource from its contract. `(cms)/page.tsx` shows it for the mock `orders` resource.
@@ -73,7 +76,8 @@ src/
 ```sh
 npm run dev      # dev server
 npm run build    # production build (also type-checks)
-npm run lint     # eslint
+npm run lint     # eslint + translation key check
+npm run i18n:check  # only the translation key check
 ```
 
 ## Rules
@@ -83,6 +87,7 @@ npm run lint     # eslint
 - Keep changes minimal and scoped: no cleanup or refactors unless asked.
 - Do not add a dependency without asking; the stack is chosen deliberately.
 - **Required: the feature folder layout.** All domain code goes in `src/features/<feature>/` with `api/`, `queries/`, `mutations/`, `hooks/`, `lib/`, `components/` and `types.ts`. Read hooks (`useQuery`) go in `queries/` and write hooks (`useMutation`) in `mutations/`, never in the same folder or file; one hook per file; query keys only from `queries/keys.ts`; only `api/` talks to the backend. The full rules are in `.claude/rules/features.md` — read it before adding or moving anything under `src/features/`. Do not add a query or mutation anywhere else.
+- **Required: no hard-coded UI text.** Every visible or announced string comes from `useTranslations()`, with the key added to all five files in `messages/` in the same change; numbers, money and dates are formatted with `useFormat()`. Text that comes from the API (labels, errors) is translated by the backend and does not go in `messages/`. The full rules are in `.claude/rules/i18n.md`.
 - Server Components by default; add `'use client'` only where interactivity needs it.
 - Never commit `.env*` files or secrets.
 - Commit or push only when asked. `main` deploys to Vercel.

@@ -1,0 +1,66 @@
+{
+  "common": {
+    "tryAgain": "Riprova",
+    "notConnected": "«{label}» non è ancora collegato"
+  },
+  "shell": {
+    "toggleMenu": "Mostra o nascondi il menu",
+    "mockData": "Dati di prova",
+    "toggleTheme": "Passa dal tema chiaro a quello scuro",
+    "menuSearch": "Cerca nel menu",
+    "clearMenuSearch": "Cancella la ricerca nel menu",
+    "menuLoadFailed": "Impossibile caricare il menu.",
+    "menuNoMatches": "Nessuna voce del menu corrisponde a <term>«{query}»</term>.",
+    "comingSoon": {
+      "title": "Non ancora realizzata",
+      "description": "Questa schermata non è ancora stata realizzata. Verrà generata dal contratto della risorsa, come gli Ordini.",
+      "back": "Torna agli Ordini"
+    }
+  },
+  "userMenu": {
+    "profile": "Profilo",
+    "language": "Lingua",
+    "sessions": "Sessioni",
+    "signOut": "Esci"
+  },
+  "table": {
+    "empty": "Nessun elemento.",
+    "range": "<range>{from}–{to}</range> di {total}",
+    "rows": "Righe",
+    "rowsPerPage": "Righe per pagina",
+    "firstPage": "Prima pagina",
+    "previousPage": "Pagina precedente",
+    "nextPage": "Pagina successiva",
+    "lastPage": "Ultima pagina"
+  },
+  "resources": {
+    "recordCount": "{count, plural, one {elemento} other {elementi}}",
+    "loadFailed": "Impossibile caricare questa risorsa",
+    "recordsLoadFailed": "Impossibile caricare gli elementi",
+    "emptyTitle": "Nessun risultato per questa vista",
+    "emptyHint": "Prova un'altra scheda o una ricerca diversa.",
+    "toolbar": {
+      "search": "Cerca",
+      "clearSearch": "Cancella la ricerca",
+      "columns": "Colonne",
+      "visibleColumns": "Colonne visibili",
+      "refresh": "Aggiorna",
+      "views": "Viste"
+    },
+    "drawer": {
+      "description": "Dettagli e azioni per {type} {id}",
+      "tabDetails": "Dettagli",
+      "tabActivity": "Attività",
+      "tabNotes": "Note",
+      "notesEmptyTitle": "Ancora nessuna nota",
+      "notesEmptyHint": "Le note sono condivise con tutti gli admin che possono aprire questo elemento.",
+      "activityEmpty": "Nessuna attività registrata.",
+      "reveal": "Mostra",
+      "revealNotConnected": "Mostrare un valore mascherato richiede un permesso e viene registrato. Non ancora collegato.",
+      "loadingTitle": "Caricamento dell'elemento",
+      "loadingDescription": "L'elemento è in caricamento.",
+      "loadFailedTitle": "Impossibile caricare questo elemento",
+      "loadFailedHint": "Potrebbe essere stato rimosso, oppure la richiesta non è riuscita."
+    }
+  }
+}

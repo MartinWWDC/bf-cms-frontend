@@ -9,6 +9,7 @@ import {
   useTable,
 } from "@tanstack/react-table";
 import { ArrowDownIcon, ArrowUpIcon, ChevronsUpDownIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { cn } from "cn";
 
 import { Skeleton } from "@/components/ui/skeleton";
@@ -73,6 +74,7 @@ export function DataTable<TData extends RowData>({
   emptyState,
   className,
 }: DataTableProps<TData>) {
+  const t = useTranslations("table");
   const table = useTable({
     features: dataTableFeatures,
     columns,
@@ -202,7 +204,7 @@ export function DataTable<TData extends RowData>({
 
       {!isLoading && rows.length === 0 ? (
         <div className="flex min-h-56 items-center justify-center px-6 py-12 text-center">
-          {emptyState ?? <p className="text-sm text-muted-foreground">No records.</p>}
+          {emptyState ?? <p className="text-sm text-muted-foreground">{t("empty")}</p>}
         </div>
       ) : null}
     </div>

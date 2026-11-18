@@ -1,6 +1,7 @@
 "use client";
 
 import { ChevronsUpDownIcon, LanguagesIcon, LogOutIcon, MonitorSmartphoneIcon, UserRoundIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -10,20 +11,30 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
-import { initials } from "@/lib/format";
 import { useMe } from "@/features/session/queries";
-
-const notConnected = (label: string) => () => toast.info(`"${label}" is not connected yet`);
+import { isLocale } from "@/i18n/config";
+import { useLocaleSwitcher } from "@/i18n/use-locale-switcher";
+import { initials } from "@/lib/format";
 
 /** The signed-in admin, with the account menu. Sits in the sidebar footer. */
 export function UserMenu() {
   const { data: admin } = useMe();
   const { isMobile } = useSidebar();
+  const t = useTranslations("userMenu");
+  const tCommon = useTranslations("common");
+  const { locale, locales, localeNames, setLocale } = useLocaleSwitcher();
+
+  const notConnected = (label: string) => () => toast.info(tCommon("notConnected", { label }));
 
   if (!admin) {
     return (
@@ -78,25 +89,41 @@ export function UserMenu() {
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem onClick={notConnected("Profile")}>
+              <DropdownMenuItem onClick={notConnected(t("profile"))}>
                 <UserRoundIcon />
-                Profile
+                {t("profile")}
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={notConnected("Language")}>
-                <LanguagesIcon />
-                Language
-                <span className="ml-auto font-mono text-xs text-muted-foreground uppercase">{admin.locale}</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={notConnected("Sessions")}>
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  <LanguagesIcon />
+                  {t("language")}
+                  <span className="ml-auto font-mono text-xs text-muted-foreground uppercase">{locale}</span>
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent className="w-44">
+                  <DropdownMenuRadioGroup
+                    value={locale}
+                    onValueChange={(value) => {
+                      if (isLocale(value)) setLocale(value);
+                    }}
+                  >
+                    {locales.map((code) => (
+                      <DropdownMenuRadioItem key={code} value={code}>
+                        {localeNames[code]}
+                      </DropdownMenuRadioItem>
+                    ))}
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+              <DropdownMenuItem onClick={notConnected(t("sessions"))}>
                 <MonitorSmartphoneIcon />
-                Sessions
+                {t("sessions")}
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem onClick={notConnected("Sign out")}>
+              <DropdownMenuItem onClick={notConnected(t("signOut"))}>
                 <LogOutIcon />
-                Sign out
+                {t("signOut")}
               </DropdownMenuItem>
             </DropdownMenuGroup>
           </DropdownMenuContent>

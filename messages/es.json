@@ -1,0 +1,66 @@
+{
+  "common": {
+    "tryAgain": "Reintentar",
+    "notConnected": "«{label}» aún no está conectado"
+  },
+  "shell": {
+    "toggleMenu": "Mostrar u ocultar el menú",
+    "mockData": "Datos de prueba",
+    "toggleTheme": "Cambiar entre tema claro y oscuro",
+    "menuSearch": "Buscar en el menú",
+    "clearMenuSearch": "Borrar la búsqueda del menú",
+    "menuLoadFailed": "No se pudo cargar el menú.",
+    "menuNoMatches": "Ninguna entrada del menú coincide con <term>«{query}»</term>.",
+    "comingSoon": {
+      "title": "Aún no está hecha",
+      "description": "Esta pantalla aún no está hecha. Se generará a partir del contrato del recurso, igual que Pedidos.",
+      "back": "Volver a Pedidos"
+    }
+  },
+  "userMenu": {
+    "profile": "Perfil",
+    "language": "Idioma",
+    "sessions": "Sesiones",
+    "signOut": "Cerrar sesión"
+  },
+  "table": {
+    "empty": "No hay registros.",
+    "range": "<range>{from}–{to}</range> de {total}",
+    "rows": "Filas",
+    "rowsPerPage": "Filas por página",
+    "firstPage": "Primera página",
+    "previousPage": "Página anterior",
+    "nextPage": "Página siguiente",
+    "lastPage": "Última página"
+  },
+  "resources": {
+    "recordCount": "{count, plural, one {registro} other {registros}}",
+    "loadFailed": "No se pudo cargar este recurso",
+    "recordsLoadFailed": "No se pudieron cargar los registros",
+    "emptyTitle": "Nada coincide con esta vista",
+    "emptyHint": "Prueba otra pestaña o una búsqueda distinta.",
+    "toolbar": {
+      "search": "Buscar",
+      "clearSearch": "Borrar la búsqueda",
+      "columns": "Columnas",
+      "visibleColumns": "Columnas visibles",
+      "refresh": "Actualizar",
+      "views": "Vistas"
+    },
+    "drawer": {
+      "description": "Detalles y acciones de {type} {id}",
+      "tabDetails": "Detalles",
+      "tabActivity": "Actividad",
+      "tabNotes": "Notas",
+      "notesEmptyTitle": "Aún no hay notas",
+      "notesEmptyHint": "Las notas se comparten con todos los admins que pueden abrir este registro.",
+      "activityEmpty": "No hay actividad registrada.",
+      "reveal": "Mostrar",
+      "revealNotConnected": "Mostrar un valor oculto requiere un permiso y queda registrado. Aún no está conectado.",
+      "loadingTitle": "Cargando el registro",
+      "loadingDescription": "El registro se está cargando.",
+      "loadFailedTitle": "No se pudo cargar este registro",
+      "loadFailedHint": "Puede que se haya eliminado o que la solicitud haya fallado."
+    }
+  }
+}

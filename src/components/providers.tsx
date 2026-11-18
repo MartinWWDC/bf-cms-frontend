@@ -7,14 +7,17 @@ import { ThemeProvider } from "next-themes";
 
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { I18nProvider } from "@/i18n/i18n-provider";
 import { getQueryClient } from "@/lib/query-client";
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
       <QueryClientProvider client={getQueryClient()}>
-        <TooltipProvider delay={300}>{children}</TooltipProvider>
-        <Toaster />
+        <I18nProvider>
+          <TooltipProvider delay={300}>{children}</TooltipProvider>
+          <Toaster />
+        </I18nProvider>
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
     </ThemeProvider>
