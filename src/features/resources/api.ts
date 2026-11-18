@@ -1,0 +1,26 @@
+import { mockDelay } from "@/mocks/delay";
+import { mockGetContract, mockGetRecord, mockListRecords } from "@/mocks/resources";
+
+import type { ListParams, ListResult, RecordDetail, ResourceContract } from "./types";
+
+/**
+ * The generic resource endpoints. Every function here is a MOCK: swap each body for the
+ * real call on the `api` client (and map the response to the types in `types.ts`) once
+ * the CMS API is reachable. Nothing outside this file knows the data is mocked.
+ *
+ *   fetchResourceContract -> GET  /resources/{resource}
+ *   fetchResourceRecords  -> GET  /resources/{resource}/records
+ *   fetchResourceRecord   -> GET  /resources/{resource}/records/{id}
+ */
+
+export function fetchResourceContract(resource: string): Promise<ResourceContract> {
+  return mockDelay(mockGetContract(resource), 200);
+}
+
+export function fetchResourceRecords(resource: string, params: ListParams): Promise<ListResult> {
+  return mockDelay(mockListRecords(resource, params), 400);
+}
+
+export function fetchResourceRecord(resource: string, id: string): Promise<RecordDetail> {
+  return mockDelay(null, 300).then(() => mockGetRecord(resource, id));
+}

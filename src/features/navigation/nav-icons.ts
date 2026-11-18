@@ -1,0 +1,71 @@
+import {
+  BadgeEuroIcon,
+  BellIcon,
+  BikeIcon,
+  BookOpenIcon,
+  Building2Icon,
+  CircleDotIcon,
+  ClipboardCheckIcon,
+  FileTextIcon,
+  FlagIcon,
+  HandCoinsIcon,
+  HistoryIcon,
+  KeyRoundIcon,
+  LayersIcon,
+  LibraryIcon,
+  ListChecksIcon,
+  type LucideIcon,
+  MegaphoneIcon,
+  MessagesSquareIcon,
+  MountainIcon,
+  PackageIcon,
+  PaletteIcon,
+  RssIcon,
+  ShieldAlertIcon,
+  ShieldCheckIcon,
+  StarIcon,
+  TagIcon,
+  TriangleAlertIcon,
+  TruckIcon,
+  UploadIcon,
+  UsersIcon,
+} from "lucide-react";
+
+/**
+ * Icons are looked up by key so the navigation can stay plain data (and later come from the API).
+ * Unknown keys fall back to a neutral dot instead of breaking the menu.
+ */
+const NAV_ICONS: Record<string, LucideIcon> = {
+  orders: PackageIcon,
+  tasks: ListChecksIcon,
+  shipping: TruckIcon,
+  money: HandCoinsIcon,
+  complaints: TriangleAlertIcon,
+  ads: BikeIcon,
+  offers: BadgeEuroIcon,
+  imports: UploadIcon,
+  feeds: RssIcon,
+  users: UsersIcon,
+  business: Building2Icon,
+  reviews: StarIcon,
+  moderation: ShieldAlertIcon,
+  messages: MessagesSquareIcon,
+  security: ShieldCheckIcon,
+  blog: BookOpenIcon,
+  collections: LayersIcon,
+  contents: FileTextIcon,
+  campaigns: MegaphoneIcon,
+  notifications: BellIcon,
+  catalog: LibraryIcon,
+  brands: TagIcon,
+  disciplines: MountainIcon,
+  colors: PaletteIcon,
+  access: KeyRoundIcon,
+  audit: HistoryIcon,
+  flags: FlagIcon,
+  jobs: ClipboardCheckIcon,
+};
+
+export function getNavIcon(key: string | undefined): LucideIcon {
+  return (key && NAV_ICONS[key]) || CircleDotIcon;
+}
