@@ -1,4 +1,5 @@
 import {
+  BriefcaseIcon, HeadsetIcon, TagsIcon, UserCheckIcon,
   ArchiveIcon, BellIcon, BikeIcon, BanIcon, BookOpenIcon, BotIcon, BoxIcon, CalendarIcon, ChartColumnIcon,
   CheckIcon, CircleDotIcon, CircleHelpIcon, CircleIcon, CpuIcon, FileTextIcon, FlagIcon, FolderTreeIcon, GaugeIcon,
   GlobeIcon, HandCoinsIcon, HeartIcon, HistoryIcon, ImageIcon, KeyRoundIcon, LanguagesIcon, LayersIcon,
@@ -17,6 +18,7 @@ import {
  * Unknown names fall back to a neutral dot instead of breaking the menu.
  */
 const NAV_ICONS: Record<string, LucideIcon> = {
+  support: HeadsetIcon, label: TagsIcon, "user-check": UserCheckIcon, briefcase: BriefcaseIcon,
   address: MapPinIcon, archive: ArchiveIcon, bell: BellIcon, bike: BikeIcon, block: BanIcon, blog: BookOpenIcon,
   bolt: ZapIcon, box: BoxIcon, calendar: CalendarIcon, cancel: BanIcon, cart: ShoppingCartIcon,
   category: FolderTreeIcon, chart: ChartColumnIcon, chat: MessageSquareIcon, check: CheckIcon, circle: CircleIcon,

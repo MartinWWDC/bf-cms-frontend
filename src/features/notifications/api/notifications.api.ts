@@ -10,8 +10,8 @@ export async function fetchNotifications(page: number, unreadOnly: boolean): Pro
 }
 
 export async function fetchUnreadCount(): Promise<number> {
-  const data = await getData<{ unread_count: number }>("/notifications/unread-count");
-  return data.unread_count;
+  const data = await getData<{ count: number }>("/notifications/unread-count");
+  return data.count;
 }
 
 export async function markNotificationRead(id: number): Promise<void> {

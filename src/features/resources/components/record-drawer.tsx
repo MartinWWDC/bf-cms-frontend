@@ -262,8 +262,9 @@ function RecordContent({ contract, record, onClose, onOpenRecord, tabActions, Sc
 
       <div className="scrollbar-slim min-h-0 flex-1 overflow-y-auto">
         <Tabs value={tab} onValueChange={(next) => setTab(String(next))} className="gap-0">
-          <div className="sticky top-0 z-10 border-b bg-popover px-5 sm:px-7">
-            <TabsList variant="line" className="scrollbar-slim h-11 max-w-full gap-4 overflow-x-auto p-0">
+          {/* The row scrolls sideways when the tabs do not fit; the list itself never clips its tabs. */}
+          <div className="sticky top-0 z-10 overflow-x-auto overflow-y-hidden border-b bg-popover px-5 [scrollbar-width:none] sm:px-7 [&::-webkit-scrollbar]:hidden">
+            <TabsList variant="line" className="h-11! w-max justify-start gap-4 p-0">
               {Screen ? (
                 <TabsTrigger value="overview" className="flex-none px-0">
                   {t("tabOverview")}
