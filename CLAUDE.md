@@ -35,7 +35,7 @@ This app replaces Nova and Airtable. How the backend works, per the plan:
 - **Actions** carry an `Idempotency-Key`; a preview returns risk flags (warnings must be acknowledged, blocking ones stop the action); actions on many records and exports are queued jobs.
 - **Fixed pages** come from the navigation as `page` nodes: `roles`, `staff`, `audit`, `tasks`, `dashboards/{key}`. Everything else is a resource `view`.
 
-The source of truth for shapes is `cms/docs` (`conventions.md`, `field-types.md`, `openapi.json`, `changelog.md`, plus one workflow page per custom screen) on backend branch `project/P-BIK-77/custom-cms`. Types in `src/lib/api/types.ts` and each feature's `types.ts` are written by hand from `openapi.json`; when the changelog lists a change, update them. If that branch is not checked out in `../bf-backend`, the docs are not available: do not invent endpoints, payloads or field types — ask.
+The source of truth for shapes is `cms/docs` (`conventions.md`, `field-types.md`, `openapi.json`, `changelog.md`, plus one workflow page per custom screen) on backend branch `project/P-BIK-77/custom-cms`. Types in `src/lib/api/types.ts` and each feature's `types.ts` are written by hand from `openapi.json`; when the changelog lists a change, run `npm run api:types` and fix what the type check reports. If that branch is not checked out in `../bf-backend`, the docs are not available: do not invent endpoints, payloads or field types — ask.
 
 ## Stack
 
@@ -46,6 +46,10 @@ The source of truth for shapes is `cms/docs` (`conventions.md`, `field-types.md`
 - TanStack Query v5 for server state; client and defaults in `src/lib/query-client.ts`, mounted in `src/components/providers.tsx`
 - TanStack Table **v9** for data tables. The API differs from v8 (`useTable`, `tableFeatures`, `table.FlexRender`); read `node_modules/@tanstack/react-table/skills/` before writing table code
 - Axios client for the CMS API in `src/lib/api/client.ts` (bearer token + `Accept-Language` + `X-Timezone`, base `NEXT_PUBLIC_CMS_API_URL/cms/v1`). Every failed request is an `ApiError` (`code`, `message`, `fields`, `details`, `requestId`); show it with `useErrorMessage()` / `useErrorToast()` / `<ErrorState>`. The token lives in `src/lib/api/auth-token.ts`
+- Rich text: Tiptap (`src/components/rich-text-editor.tsx`) for editing, `RichText` for display (sanitised again in the browser)
+- Codes: `qrcode.react` (two-factor setup, warehouse labels), `jsbarcode` (Code 128 on labels), `@yudiel/react-qr-scanner` (camera scanning on the warehouse scan page)
+- Live updates: `pusher-js`, connected only where `GET /live` says it is enabled (`features/live`); polling is the fallback
+- API types: `npm run api:types` generates `src/lib/api/schema.d.ts` from `../bf-backend/cms/docs/openapi.json`. Feature types stay hand-written; `src/lib/api/schema-check.ts` fails the build when they no longer fit the spec
 - next-intl for translations, used client-side without locale routing: messages in `messages/{en,de,it,es,fr}.json`, provider and helpers in `src/i18n/`
 
 Environment variables are listed in `.env.example`.
@@ -83,6 +87,7 @@ npm run dev      # dev server
 npm run build    # production build (also type-checks)
 npm run lint     # eslint + translation key check
 npm run i18n:check  # only the translation key check
+npm run api:types   # regenerate src/lib/api/schema.d.ts from the backend spec
 ```
 
 ## Rules

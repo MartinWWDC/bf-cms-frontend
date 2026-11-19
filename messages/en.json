@@ -301,7 +301,8 @@
       "unpin": "Unpin",
       "edit": "Edit note",
       "delete": "Delete note",
-      "deleteConfirm": "Delete this note? The history keeps that it was deleted."
+      "deleteConfirm": "Delete this note? The history keeps that it was deleted.",
+      "formatting": "Formatting"
     },
     "filters": {
       "title": "Filter",
@@ -409,7 +410,9 @@
     "openAuthenticator": "Open in an authenticator app on this device",
     "recoveryTitle": "Store your recovery codes",
     "recoveryDescription": "Each code works once when you cannot use your authenticator app. They are shown only this once.",
-    "recoveryContinue": "I stored them, continue"
+    "recoveryContinue": "I stored them, continue",
+    "qrLabel": "QR code for your authenticator app",
+    "qrHint": "Scan this code with your authenticator app, or enter the setup key below by hand."
   },
   "account": {
     "recovery": {
@@ -1146,7 +1149,10 @@
       "empty": "Nothing scanned yet. The field above is ready for the scanner.",
       "notFound": "Nothing found for this code",
       "loadFailed": "The code could not be looked up",
-      "recent": "Last scans"
+      "recent": "Last scans",
+      "cameraOn": "Scan with the camera",
+      "cameraOff": "Turn the camera off",
+      "cameraFailed": "The camera could not be started. Allow camera access for this site, or type the code."
     },
     "item": {
       "title": "Item",
@@ -1187,5 +1193,23 @@
     "loadFailed": "The document could not be loaded",
     "disabledTitle": "The documents are not published here",
     "disabledHint": "This environment does not serve the API documents."
+  },
+  "editor": {
+    "toolbar": "Formatting",
+    "bold": "Bold",
+    "italic": "Italic",
+    "underline": "Underline",
+    "strike": "Strikethrough",
+    "code": "Code",
+    "heading2": "Heading",
+    "heading3": "Subheading",
+    "bulletList": "Bullet list",
+    "orderedList": "Numbered list",
+    "quote": "Quote",
+    "link": "Add or change link",
+    "unlink": "Remove link",
+    "linkPrompt": "Link address (https://…). Leave empty to remove the link.",
+    "undo": "Undo",
+    "redo": "Redo"
   }
 }

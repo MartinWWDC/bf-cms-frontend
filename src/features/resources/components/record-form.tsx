@@ -6,6 +6,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { cn } from "cn";
 
+import { RichTextEditor } from "@/components/rich-text-editor";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -467,15 +468,26 @@ function TranslatedField({
                   disabled={disabled}
                   onChange={(next) => onChange({ ...value, [code]: next as string | null })}
                 />
+              ) : field.type === "rich_text" ? (
+                <div className="min-w-0 flex-1">
+                  <RichTextEditor
+                    id={inputId}
+                    value={text}
+                    disabled={disabled}
+                    invalid={Boolean(error)}
+                    compact
+                    onChange={set}
+                  />
+                </div>
               ) : multiline || !isText ? (
                 <Textarea
                   id={inputId}
-                  rows={field.type === "rich_text" ? 5 : 3}
+                  rows={3}
                   value={text}
                   disabled={disabled}
                   aria-invalid={Boolean(error) || undefined}
                   onChange={(event) => set(event.target.value)}
-                  className={cn("bg-card", field.type === "rich_text" && "font-mono text-[0.8125rem]")}
+                  className="bg-card"
                 />
               ) : (
                 <Input

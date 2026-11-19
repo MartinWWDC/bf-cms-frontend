@@ -301,7 +301,8 @@
       "unpin": "Désépingler",
       "edit": "Modifier la note",
       "delete": "Supprimer la note",
-      "deleteConfirm": "Supprimer cette note ? L'historique conserve la trace de la suppression."
+      "deleteConfirm": "Supprimer cette note ? L'historique conserve la trace de la suppression.",
+      "formatting": "Mise en forme"
     },
     "filters": {
       "title": "Filtre",
@@ -409,7 +410,9 @@
     "openAuthenticator": "Ouvrir dans une application d'authentification sur cet appareil",
     "recoveryTitle": "Conservez vos codes de récupération",
     "recoveryDescription": "Chaque code fonctionne une fois lorsque vous ne pouvez pas utiliser votre application d'authentification. Ils ne sont affichés que cette fois.",
-    "recoveryContinue": "Je les ai conservés, continuer"
+    "recoveryContinue": "Je les ai conservés, continuer",
+    "qrLabel": "Code QR pour votre application d'authentification",
+    "qrHint": "Scannez ce code avec votre application d'authentification ou saisissez la clé ci-dessous à la main."
   },
   "account": {
     "recovery": {
@@ -1146,7 +1149,10 @@
       "empty": "Rien de scanné pour l'instant. Le champ ci-dessus est prêt pour le scanner.",
       "notFound": "Rien trouvé pour ce code",
       "loadFailed": "Impossible de rechercher le code",
-      "recent": "Derniers scans"
+      "recent": "Derniers scans",
+      "cameraOn": "Scanner avec la caméra",
+      "cameraOff": "Éteindre la caméra",
+      "cameraFailed": "Impossible de démarrer la caméra. Autorisez l'accès à la caméra pour ce site ou saisissez le code."
     },
     "item": {
       "title": "Article",
@@ -1187,5 +1193,23 @@
     "loadFailed": "Impossible de charger le document",
     "disabledTitle": "Les documents ne sont pas publiés ici",
     "disabledHint": "Cet environnement ne fournit pas les documents de l'API."
+  },
+  "editor": {
+    "toolbar": "Mise en forme",
+    "bold": "Gras",
+    "italic": "Italique",
+    "underline": "Souligné",
+    "strike": "Barré",
+    "code": "Code",
+    "heading2": "Titre",
+    "heading3": "Sous-titre",
+    "bulletList": "Liste à puces",
+    "orderedList": "Liste numérotée",
+    "quote": "Citation",
+    "link": "Ajouter ou modifier un lien",
+    "unlink": "Supprimer le lien",
+    "linkPrompt": "Adresse du lien (https://…). Laissez vide pour supprimer le lien.",
+    "undo": "Annuler",
+    "redo": "Rétablir"
   }
 }

@@ -5,6 +5,7 @@ import { PlusIcon, Trash2Icon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { cn } from "cn";
 
+import { RichTextEditor } from "@/components/rich-text-editor";
 import { SimpleSelect } from "@/components/simple-select";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -94,13 +95,24 @@ export function FieldInput(props: FieldInputProps) {
       );
 
     case "rich_text":
+      return (
+        <RichTextEditor
+          id={id}
+          value={text}
+          disabled={disabled}
+          invalid={invalid}
+          aria-describedby={describedBy}
+          onChange={(html) => onChange(html)}
+        />
+      );
+
     case "code":
       return (
         <Textarea
           {...common}
           value={text}
-          rows={field.type === "code" ? 8 : 6}
-          spellCheck={field.type === "rich_text"}
+          rows={8}
+          spellCheck={false}
           onChange={(event) => onChange(event.target.value)}
           className="bg-card font-mono text-[0.8125rem]"
         />

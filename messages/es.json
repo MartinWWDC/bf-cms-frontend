@@ -301,7 +301,8 @@
       "unpin": "Desfijar",
       "edit": "Editar nota",
       "delete": "Eliminar nota",
-      "deleteConfirm": "¿Eliminar esta nota? El historial conserva que se eliminó."
+      "deleteConfirm": "¿Eliminar esta nota? El historial conserva que se eliminó.",
+      "formatting": "Formato"
     },
     "filters": {
       "title": "Filtro",
@@ -409,7 +410,9 @@
     "openAuthenticator": "Abrir en una aplicación de autenticación en este dispositivo",
     "recoveryTitle": "Guarda tus códigos de recuperación",
     "recoveryDescription": "Cada código funciona una vez cuando no puedes usar tu aplicación de autenticación. Solo se muestran esta vez.",
-    "recoveryContinue": "Los he guardado, continuar"
+    "recoveryContinue": "Los he guardado, continuar",
+    "qrLabel": "Código QR para tu aplicación de autenticación",
+    "qrHint": "Escanea este código con tu aplicación de autenticación o introduce a mano la clave de abajo."
   },
   "account": {
     "recovery": {
@@ -1146,7 +1149,10 @@
       "empty": "Aún no se ha escaneado nada. El campo de arriba está listo para el escáner.",
       "notFound": "No se encontró nada con este código",
       "loadFailed": "No se pudo buscar el código",
-      "recent": "Últimos escaneos"
+      "recent": "Últimos escaneos",
+      "cameraOn": "Escanear con la cámara",
+      "cameraOff": "Apagar la cámara",
+      "cameraFailed": "No se pudo iniciar la cámara. Permite el acceso a la cámara para este sitio o escribe el código."
     },
     "item": {
       "title": "Artículo",
@@ -1187,5 +1193,23 @@
     "loadFailed": "No se pudo cargar el documento",
     "disabledTitle": "Los documentos no están publicados aquí",
     "disabledHint": "Este entorno no ofrece los documentos de la API."
+  },
+  "editor": {
+    "toolbar": "Formato",
+    "bold": "Negrita",
+    "italic": "Cursiva",
+    "underline": "Subrayado",
+    "strike": "Tachado",
+    "code": "Código",
+    "heading2": "Título",
+    "heading3": "Subtítulo",
+    "bulletList": "Lista con viñetas",
+    "orderedList": "Lista numerada",
+    "quote": "Cita",
+    "link": "Añadir o cambiar enlace",
+    "unlink": "Quitar enlace",
+    "linkPrompt": "Dirección del enlace (https://…). Déjalo vacío para quitar el enlace.",
+    "undo": "Deshacer",
+    "redo": "Rehacer"
   }
 }

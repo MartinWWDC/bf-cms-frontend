@@ -4,6 +4,7 @@ import { type FormEvent, type ReactNode, useEffect, useId, useState } from "reac
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeftIcon, CopyIcon, KeyRoundIcon, ShieldCheckIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { QRCodeSVG } from "qrcode.react";
 import { toast } from "sonner";
 
 import { Brand } from "@/components/layout/brand";
@@ -220,6 +221,11 @@ function CodeStep({
 
       {setup && challenge.setup ? (
         <div className="flex flex-col gap-2 rounded-lg border bg-muted/50 p-3">
+          {/* The QR code carries the secret: it is drawn in the browser and never sent anywhere. */}
+          <div className="flex justify-center rounded-md bg-white p-3">
+            <QRCodeSVG value={challenge.setup.otpauth_uri} size={176} level="M" title={t("qrLabel")} />
+          </div>
+          <p className="text-xs text-muted-foreground">{t("qrHint")}</p>
           <p className="font-mono text-[0.6875rem] tracking-wider text-muted-foreground uppercase">{t("setupKey")}</p>
           <div className="flex items-start gap-2">
             <code className="min-w-0 flex-1 font-mono text-sm break-all select-all">{challenge.setup.secret}</code>

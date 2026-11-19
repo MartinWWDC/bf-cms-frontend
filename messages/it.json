@@ -301,7 +301,8 @@
       "unpin": "Rimuovi",
       "edit": "Modifica nota",
       "delete": "Elimina nota",
-      "deleteConfirm": "Eliminare questa nota? La cronologia conserva l'eliminazione."
+      "deleteConfirm": "Eliminare questa nota? La cronologia conserva l'eliminazione.",
+      "formatting": "Formattazione"
     },
     "filters": {
       "title": "Filtro",
@@ -409,7 +410,9 @@
     "openAuthenticator": "Apri in un'app di autenticazione su questo dispositivo",
     "recoveryTitle": "Conserva i codici di recupero",
     "recoveryDescription": "Ogni codice funziona una volta quando non puoi usare l'app di autenticazione. Vengono mostrati solo questa volta.",
-    "recoveryContinue": "Li ho salvati, continua"
+    "recoveryContinue": "Li ho salvati, continua",
+    "qrLabel": "Codice QR per la tua app di autenticazione",
+    "qrHint": "Scansiona questo codice con la tua app di autenticazione oppure inserisci a mano la chiave qui sotto."
   },
   "account": {
     "recovery": {
@@ -1146,7 +1149,10 @@
       "empty": "Ancora nessuna scansione. Il campo qui sopra è pronto per lo scanner.",
       "notFound": "Nessun risultato per questo codice",
       "loadFailed": "Impossibile cercare il codice",
-      "recent": "Ultime scansioni"
+      "recent": "Ultime scansioni",
+      "cameraOn": "Scansiona con la fotocamera",
+      "cameraOff": "Spegni la fotocamera",
+      "cameraFailed": "Impossibile avviare la fotocamera. Consenti l'accesso alla fotocamera per questo sito oppure digita il codice."
     },
     "item": {
       "title": "Articolo",
@@ -1187,5 +1193,23 @@
     "loadFailed": "Impossibile caricare il documento",
     "disabledTitle": "I documenti non sono pubblicati qui",
     "disabledHint": "Questo ambiente non fornisce i documenti API."
+  },
+  "editor": {
+    "toolbar": "Formattazione",
+    "bold": "Grassetto",
+    "italic": "Corsivo",
+    "underline": "Sottolineato",
+    "strike": "Barrato",
+    "code": "Codice",
+    "heading2": "Titolo",
+    "heading3": "Sottotitolo",
+    "bulletList": "Elenco puntato",
+    "orderedList": "Elenco numerato",
+    "quote": "Citazione",
+    "link": "Aggiungi o modifica link",
+    "unlink": "Rimuovi link",
+    "linkPrompt": "Indirizzo del link (https://…). Lascia vuoto per rimuovere il link.",
+    "undo": "Annulla",
+    "redo": "Ripeti"
   }
 }

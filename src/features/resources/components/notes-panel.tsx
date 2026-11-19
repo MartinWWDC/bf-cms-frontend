@@ -8,6 +8,7 @@ import { cn } from "cn";
 
 import { ErrorState } from "@/components/error-state";
 import { RichText } from "@/components/rich-text";
+import { RichTextEditor } from "@/components/rich-text-editor";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -15,6 +16,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useFormat } from "@/i18n/use-format";
 import { useErrorToast } from "@/lib/api/use-error-message";
 import type { AdminRef, RecordId } from "@/lib/api/types";
+import { htmlToText } from "@/lib/sanitize-html";
 
 import { useCreateNote, useDeleteNote, usePinNote, useUpdateNote } from "../mutations";
 import { useNotes } from "../queries";
@@ -129,6 +131,7 @@ function NoteComposer({ resource, recordId, draft }: { resource: string; recordI
   const [body, setBody] = useState(draft ?? "");
   const [mentions, setMentions] = useState<AdminRef[]>([]);
   const [files, setFiles] = useState<File[]>([]);
+  const [rich, setRich] = useState(false);
 
   const addFiles = (list: FileList | null) => {
     const added = [...(list ?? [])];
@@ -145,7 +148,7 @@ function NoteComposer({ resource, recordId, draft }: { resource: string; recordI
     event.preventDefault();
     if (!body.trim()) return;
     create.mutate(
-      { body: body.trim(), format: "plain", mentions: mentions.map((mention) => mention.id), attachments: files },
+      { body: body.trim(), format: rich ? "rich" : "plain", mentions: mentions.map((mention) => mention.id), attachments: files },
       {
         onSuccess: () => {
           setBody("");
@@ -159,19 +162,23 @@ function NoteComposer({ resource, recordId, draft }: { resource: string; recordI
 
   return (
     <form onSubmit={submit} className="flex flex-col gap-2 rounded-lg border bg-muted/40 p-3">
-      <Textarea
-        value={body}
-        maxLength={MAX_BODY}
-        rows={3}
-        placeholder={t("placeholder")}
-        aria-label={t("placeholder")}
-        disabled={create.isPending}
-        onChange={(event) => setBody(event.target.value)}
-        onKeyDown={(event) => {
-          if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) submit(event);
-        }}
-        className="bg-card"
-      />
+      {rich ? (
+        <RichTextEditor value={body} compact disabled={create.isPending} aria-label={t("placeholder")} onChange={setBody} />
+      ) : (
+        <Textarea
+          value={body}
+          maxLength={MAX_BODY}
+          rows={3}
+          placeholder={t("placeholder")}
+          aria-label={t("placeholder")}
+          disabled={create.isPending}
+          onChange={(event) => setBody(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) submit(event);
+          }}
+          className="bg-card"
+        />
+      )}
       <MentionChips mentions={mentions} onRemove={(id) => setMentions(mentions.filter((mention) => mention.id !== id))} />
       {files.length > 0 ? (
         <ul className="flex flex-col gap-1 text-xs">
@@ -222,6 +229,18 @@ function NoteComposer({ resource, recordId, draft }: { resource: string; recordI
           <PaperclipIcon />
           {t("attach")}
         </Button>
+        <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <Checkbox
+            checked={rich}
+            disabled={create.isPending}
+            onCheckedChange={(checked) => {
+              // Text typed so far stays; switching back keeps the words and drops the formatting.
+              if (checked !== true) setBody(htmlToText(body));
+              setRich(checked === true);
+            }}
+          />
+          {t("formatting")}
+        </label>
         <Button type="submit" size="sm" className="ml-auto" disabled={create.isPending || !body.trim()}>
           {create.isPending ? t("adding") : t("add")}
         </Button>

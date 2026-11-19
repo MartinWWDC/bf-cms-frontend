@@ -1,9 +1,10 @@
 "use client";
 
 import { type FormEvent, useEffect, useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useQueryClient } from "@tanstack/react-query";
-import { MapPinIcon, PackageIcon, PrinterIcon, ScanLineIcon } from "lucide-react";
+import { MapPinIcon, PackageIcon, PrinterIcon, ScanLineIcon, CameraIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { cn } from "cn";
 
@@ -22,6 +23,9 @@ import { recordHref, routes } from "@/lib/routes";
 
 import { useWarehouseScan, warehouseKeys } from "../queries";
 import { CODE_PATTERN, type ScannedItem, type ScannedLocation } from "../types";
+
+// The camera reader is only downloaded when the admin turns the camera on.
+const CameraScanner = dynamic(() => import("./camera-scanner"), { ssr: false });
 
 const STOCK_ITEMS = "stock_items";
 const MAX_RECENT = 8;
@@ -70,6 +74,8 @@ export function ScanScreen() {
       setRecent((current) => current.map((entry) => (entry.code === code ? { ...entry, label } : entry)));
     }
   }
+
+  const [cameraOn, setCameraOn] = useState(false);
 
   const lookUp = (next: string) => {
     const value = next.trim();
@@ -151,6 +157,19 @@ export function ScanScreen() {
             <Button type="submit" size="lg" className="h-14 px-6 text-base" disabled={draft.trim() === ""}>
               {t("scan.lookUp")}
             </Button>
+          </div>
+          <div className="flex flex-col gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              className="self-start"
+              aria-pressed={cameraOn}
+              onClick={() => setCameraOn(!cameraOn)}
+            >
+              <CameraIcon />
+              {cameraOn ? t("scan.cameraOff") : t("scan.cameraOn")}
+            </Button>
+            {cameraOn ? <CameraScanner onCode={lookUp} /> : null}
           </div>
           {invalid ? (
             <p role="alert" className="text-sm text-destructive">

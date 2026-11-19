@@ -301,7 +301,8 @@
       "unpin": "Lösen",
       "edit": "Notiz bearbeiten",
       "delete": "Notiz löschen",
-      "deleteConfirm": "Diese Notiz löschen? Im Verlauf bleibt vermerkt, dass sie gelöscht wurde."
+      "deleteConfirm": "Diese Notiz löschen? Im Verlauf bleibt vermerkt, dass sie gelöscht wurde.",
+      "formatting": "Formatierung"
     },
     "filters": {
       "title": "Filter",
@@ -409,7 +410,9 @@
     "openAuthenticator": "In einer Authenticator-App auf diesem Gerät öffnen",
     "recoveryTitle": "Bewahre deine Wiederherstellungscodes auf",
     "recoveryDescription": "Jeder Code funktioniert einmal, wenn du deine Authenticator-App nicht nutzen kannst. Sie werden nur dieses eine Mal angezeigt.",
-    "recoveryContinue": "Ich habe sie gespeichert, weiter"
+    "recoveryContinue": "Ich habe sie gespeichert, weiter",
+    "qrLabel": "QR-Code für deine Authenticator-App",
+    "qrHint": "Scanne diesen Code mit deiner Authenticator-App oder gib den Einrichtungsschlüssel unten von Hand ein."
   },
   "account": {
     "recovery": {
@@ -1146,7 +1149,10 @@
       "empty": "Noch nichts gescannt. Das Feld oben ist bereit für den Scanner.",
       "notFound": "Nichts zu diesem Code gefunden",
       "loadFailed": "Der Code konnte nicht nachgeschlagen werden",
-      "recent": "Letzte Scans"
+      "recent": "Letzte Scans",
+      "cameraOn": "Mit der Kamera scannen",
+      "cameraOff": "Kamera ausschalten",
+      "cameraFailed": "Die Kamera konnte nicht gestartet werden. Erlaube den Kamerazugriff für diese Seite oder tippe den Code ein."
     },
     "item": {
       "title": "Artikel",
@@ -1187,5 +1193,23 @@
     "loadFailed": "Das Dokument konnte nicht geladen werden",
     "disabledTitle": "Die Dokumente sind hier nicht veröffentlicht",
     "disabledHint": "Diese Umgebung stellt die API-Dokumente nicht bereit."
+  },
+  "editor": {
+    "toolbar": "Formatierung",
+    "bold": "Fett",
+    "italic": "Kursiv",
+    "underline": "Unterstrichen",
+    "strike": "Durchgestrichen",
+    "code": "Code",
+    "heading2": "Überschrift",
+    "heading3": "Zwischenüberschrift",
+    "bulletList": "Aufzählung",
+    "orderedList": "Nummerierte Liste",
+    "quote": "Zitat",
+    "link": "Link hinzufügen oder ändern",
+    "unlink": "Link entfernen",
+    "linkPrompt": "Linkadresse (https://…). Leer lassen, um den Link zu entfernen.",
+    "undo": "Rückgängig",
+    "redo": "Wiederholen"
   }
 }

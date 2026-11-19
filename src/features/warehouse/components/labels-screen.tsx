@@ -15,6 +15,7 @@ import { routes } from "@/lib/routes";
 
 import { useWarehouseLabels } from "../queries";
 import { MAX_LABELS, parseCodes, type WarehouseLabel } from "../types";
+import { LabelCodes } from "./label-codes";
 
 /**
  * Labels for item and location codes (`GET /warehouse/labels`), laid out for printing: on
@@ -112,15 +113,9 @@ function LabelBlock({ label }: { label: WarehouseLabel }) {
       </p>
       <p className="text-lg leading-tight font-semibold break-words">{label.title}</p>
       {label.subtitle ? <p className="text-sm break-words">{label.subtitle}</p> : null}
-      {/*
-        OPEN POINT (BIK-3926): the barcode (`label.barcode`, Code 128) and the QR code
-        (`label.qr`) are drawn here once a barcode library is approved as a dependency.
-        Until then the label carries the code as text only.
-      */}
+      <LabelCodes barcode={label.barcode.value} qr={label.qr} />
       <p
-        data-barcode-format={label.barcode.format}
-        data-barcode-value={label.barcode.value}
-        className="mt-1 border-t border-dashed border-black/40 pt-2 font-mono text-3xl font-semibold tracking-widest break-all"
+        className="mt-1 border-t border-dashed border-black/40 pt-2 font-mono text-2xl font-semibold tracking-widest break-all"
       >
         {label.code}
       </p>
