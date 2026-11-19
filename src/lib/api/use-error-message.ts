@@ -20,6 +20,7 @@ export function useErrorMessage() {
           return t("rateLimitedWait", { seconds: Math.ceil(error.retryAfter) });
         }
         if (error.message) return error.message;
+        if (error.code === "not_cms_api") return t("notCmsApi");
         if (error.code === "network_error") return t("network");
         if (error.code === "timeout") return t("timeout");
         if (error.status === 429) return t("rateLimited");

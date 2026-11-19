@@ -28,8 +28,8 @@ import {
   WITHIN_PRESETS,
 } from "../lib/filters";
 import type { Contract, Field, FilterCondition, FilterGroup, FilterNode, Operator } from "../types";
-import { FieldInput } from "./field-input";
-import { RecordPicker, StaffPicker } from "./pickers";
+import { FieldInput } from "@/components/resource/field-input";
+import { RecordPicker, StaffPicker } from "@/components/resource/pickers";
 
 interface FilterBuilderProps {
   contract: Contract;

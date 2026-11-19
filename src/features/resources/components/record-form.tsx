@@ -18,8 +18,8 @@ import { isMasked, isMoney, isReference, type Translated } from "@/lib/api/types
 import { getField, getValue } from "../lib/contract";
 import { useCreateRecord, useSuggestTranslations, useUpdateRecord } from "../mutations";
 import type { Contract, Field, RecordDetail, RecordInput } from "../types";
-import { FieldInput } from "./field-input";
-import { FieldValue } from "./field-value";
+import { FieldInput } from "@/components/resource/field-input";
+import { FieldValue } from "@/components/resource/field-value";
 
 interface RecordFormProps {
   contract: Contract;

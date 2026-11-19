@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { StaffPicker } from "@/features/resources/components/pickers";
+import { StaffPicker } from "@/components/resource/pickers";
 
 import type { SettableTaskStatus, TaskOperation } from "../types";
 

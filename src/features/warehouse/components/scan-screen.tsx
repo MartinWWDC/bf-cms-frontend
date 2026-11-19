@@ -14,7 +14,7 @@ import { StatusBadge } from "@/components/status-badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ActionDialog, type ActionRun } from "@/features/resources/components/action-dialog";
+import { ActionDialog, type ActionRun } from "@/components/resource/action-dialog";
 import { useResourceContract } from "@/features/resources/queries";
 import { useFormat } from "@/i18n/use-format";
 import { getApiErrorStatus } from "@/lib/api/client";
@@ -60,15 +60,16 @@ export function ScanScreen() {
   }, [run, scan.dataUpdatedAt]);
 
   // Remember what was scanned: the location for the next movement, and the list of last scans.
-  const scannedLocation = location?.code ?? null;
-  const scannedLabel = scan.data ? (item?.name ?? location?.name ?? null) : null;
-  useEffect(() => {
-    if (scannedLocation) setLastLocation(scannedLocation);
-  }, [scannedLocation]);
-  useEffect(() => {
-    if (!code || scannedLabel === null) return;
-    setRecent((current) => current.map((entry) => (entry.code === code ? { ...entry, label: scannedLabel } : entry)));
-  }, [code, scannedLabel]);
+  // Done while rendering the new answer, so there is no extra effect pass.
+  const [seen, setSeen] = useState(scan.data);
+  if (scan.data && scan.data !== seen) {
+    setSeen(scan.data);
+    if (location) setLastLocation(location.code);
+    const label = item?.name ?? location?.name ?? null;
+    if (code && label !== null) {
+      setRecent((current) => current.map((entry) => (entry.code === code ? { ...entry, label } : entry)));
+    }
+  }
 
   const lookUp = (next: string) => {
     const value = next.trim();

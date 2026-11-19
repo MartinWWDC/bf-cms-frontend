@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import type { DataTableColumn, DataTableColumnMeta } from "@/components/data-table/table-features";
 import type { RecordId } from "@/lib/api/types";
 
-import { FieldValue } from "../components/field-value";
+import { FieldValue } from "@/components/resource/field-value";
 import type { Field, ResourceRecord } from "../types";
 import { getValue } from "./contract";
 

@@ -384,7 +384,8 @@
     "notFound": "Introuvable.",
     "rateLimited": "Trop de requêtes. Patientez un instant et réessayez.",
     "rateLimitedWait": "Trop de tentatives. Réessayez dans {seconds, plural, one {# seconde} other {# secondes}}.",
-    "requestId": "ID de requête : {id}"
+    "requestId": "ID de requête : {id}",
+    "notCmsApi": "La réponse ne vient pas de l'API du CMS. Vérifiez l'adresse de l'API (NEXT_PUBLIC_CMS_API_URL)."
   },
   "login": {
     "title": "Connexion",

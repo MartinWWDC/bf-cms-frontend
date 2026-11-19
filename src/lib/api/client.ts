@@ -130,7 +130,16 @@ api.interceptors.request.use((config) => {
 });
 
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // A page instead of JSON means the request did not reach the CMS API: the API address is
+    // missing or wrong (`NEXT_PUBLIC_CMS_API_URL`), and this app's own server answered.
+    const type = String(response.headers["content-type"] ?? "");
+    const expectsJson = !response.config.responseType || response.config.responseType === "json";
+    if (expectsJson && response.status !== 204 && typeof response.data === "string" && !type.includes("json")) {
+      return Promise.reject(new ApiError({ status: response.status, code: "not_cms_api", message: "" }));
+    }
+    return response;
+  },
   (error: unknown) => {
     const apiError = toApiError(error);
     // The session is gone (expired, idle too long, revoked or password changed).

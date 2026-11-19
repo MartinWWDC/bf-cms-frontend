@@ -13,7 +13,7 @@ import { isMasked, type RecordId, type Translated } from "@/lib/api/types";
 import { getField, getValue } from "../lib/contract";
 import { useRevealField } from "../mutations";
 import type { Contract, Field, RecordDetail } from "../types";
-import { FieldValue } from "./field-value";
+import { FieldValue } from "@/components/resource/field-value";
 
 /** A revealed value is shown only while the admin is looking at it, then masked again. */
 const REVEAL_SECONDS = 30;

@@ -384,7 +384,8 @@
     "notFound": "Elemento non trovato.",
     "rateLimited": "Troppe richieste. Attendi un momento e riprova.",
     "rateLimitedWait": "Troppi tentativi. Riprova tra {seconds, plural, one {# secondo} other {# secondi}}.",
-    "requestId": "ID richiesta: {id}"
+    "requestId": "ID richiesta: {id}",
+    "notCmsApi": "La risposta non proviene dall'API del CMS. Controlla l'indirizzo dell'API (NEXT_PUBLIC_CMS_API_URL)."
   },
   "login": {
     "title": "Accedi",

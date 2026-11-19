@@ -22,8 +22,8 @@ import { trackJob } from "@/features/jobs/hooks";
 import { getApiErrorCode, isApiError, newIdempotencyKey } from "@/lib/api/client";
 import { useErrorMessage } from "@/lib/api/use-error-message";
 
-import { type ActionTarget, usePreviewAction, useRunAction } from "../mutations";
-import type { Action, ActionFlag, ActionInput, ActionPreview, ActionResult, VisibleWhen } from "../types";
+import { type ActionTarget, usePreviewAction, useRunAction } from "@/features/resources/mutations";
+import type { Action, ActionFlag, ActionInput, ActionPreview, ActionResult, VisibleWhen } from "@/features/resources/types";
 import { FieldInput } from "./field-input";
 import { FieldValue } from "./field-value";
 

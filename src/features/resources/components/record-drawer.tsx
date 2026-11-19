@@ -27,8 +27,8 @@ import { isMoney, type RecordId } from "@/lib/api/types";
 import { getAction, getRecordTitle, getValue } from "../lib/contract";
 import { useDeleteRecord, useRestoreRecord } from "../mutations";
 import { useResourceContract, useResourceRecord } from "../queries";
-import type { Action, Contract, RecordDetail } from "../types";
-import { ActionDialog, type ActionRun } from "./action-dialog";
+import type { Action, Contract, RecordDetail, RecordScreenProps, ScreenRegistry } from "../types";
+import { ActionDialog, type ActionRun } from "@/components/resource/action-dialog";
 import { AssigneeControl } from "./assignee-control";
 import { HistoryPanel } from "./history-panel";
 import { NotesPanel } from "./notes-panel";
@@ -39,19 +39,6 @@ import { RelatedList } from "./related-list";
 /** Id used in the URL for the create form. */
 export const NEW_RECORD = "new";
 
-/** What a custom-built screen gets. It loads its own data from the record's `screen` endpoint. */
-export interface RecordScreenProps {
-  contract: Contract;
-  record: RecordDetail;
-  onOpenRecord: (resource: string, id: RecordId) => void;
-  /** Opens the normal action dialog for one of the record's actions. */
-  onRunAction: (actionKey: string, initialInput?: Record<string, unknown>) => void;
-  /** Closes the drawer and opens another record of the same resource (moderation "next"). */
-  onShowRecord: (id: RecordId) => void;
-}
-
-/** Custom screens by resource key, supplied by the page. The generic layout is the fallback. */
-export type ScreenRegistry = Record<string, ComponentType<RecordScreenProps>>;
 
 interface RecordDrawerProps {
   /** The record to show; `null` closes the drawer. `id: "new"` shows the create form. */
@@ -496,3 +483,5 @@ function DrawerSkeleton() {
     </>
   );
 }
+
+export type { RecordScreenProps, ScreenRegistry };

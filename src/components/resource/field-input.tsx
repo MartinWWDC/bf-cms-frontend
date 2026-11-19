@@ -15,7 +15,7 @@ import { localeNames, locales } from "@/i18n/config";
 import { useFormat } from "@/i18n/use-format";
 import type { RecordId } from "@/lib/api/types";
 
-import type { FieldConfig, FieldType } from "../types";
+import type { FieldConfig, FieldType } from "@/features/resources/types";
 import { RecordPicker, StaffPicker } from "./pickers";
 
 /** The parts of a contract field or an action input that decide its form control. */

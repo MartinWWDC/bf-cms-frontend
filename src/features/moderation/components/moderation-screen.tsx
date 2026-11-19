@@ -9,7 +9,7 @@ import { ErrorState } from "@/components/error-state";
 import { StatusBadge } from "@/components/status-badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { RecordScreenProps } from "@/features/resources/components/record-drawer";
+import type { RecordScreenProps } from "@/features/resources/types";
 import { useRecordScreen } from "@/features/resources/queries";
 import { useFormat } from "@/i18n/use-format";
 import type { RecordId, Tone } from "@/lib/api/types";

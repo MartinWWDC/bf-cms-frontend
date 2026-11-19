@@ -75,10 +75,10 @@ import type {
   ResourceRecord,
   SavedViewInput,
 } from "../types";
-import { ActionDialog, type ActionRun } from "./action-dialog";
-import { FieldValue } from "./field-value";
+import { ActionDialog, type ActionRun } from "@/components/resource/action-dialog";
+import { FieldValue } from "@/components/resource/field-value";
 import { FilterBuilder } from "./filter-builder";
-import { StaffPicker } from "./pickers";
+import { StaffPicker } from "@/components/resource/pickers";
 import { NEW_RECORD, RecordDrawer, type ScreenRegistry } from "./record-drawer";
 import { SavedViewsMenu } from "./saved-views-menu";
 import { SearchField } from "./search-field";

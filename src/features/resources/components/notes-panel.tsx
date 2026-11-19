@@ -19,7 +19,7 @@ import type { AdminRef, RecordId } from "@/lib/api/types";
 import { useCreateNote, useDeleteNote, usePinNote, useUpdateNote } from "../mutations";
 import { useNotes } from "../queries";
 import type { Contract, Note } from "../types";
-import { StaffPicker } from "./pickers";
+import { StaffPicker } from "@/components/resource/pickers";
 
 /** Limits of the API (`conventions.md`, Notes). */
 const MAX_BODY = 20_000;

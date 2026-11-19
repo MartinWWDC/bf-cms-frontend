@@ -384,7 +384,8 @@
     "notFound": "Das wurde nicht gefunden.",
     "rateLimited": "Zu viele Anfragen. Warte einen Moment und versuche es erneut.",
     "rateLimitedWait": "Zu viele Versuche. Versuche es in {seconds, plural, one {# Sekunde} other {# Sekunden}} erneut.",
-    "requestId": "Anfrage-ID: {id}"
+    "requestId": "Anfrage-ID: {id}",
+    "notCmsApi": "Die Antwort kam nicht von der CMS-API. Prüfe die API-Adresse (NEXT_PUBLIC_CMS_API_URL)."
   },
   "login": {
     "title": "Anmelden",

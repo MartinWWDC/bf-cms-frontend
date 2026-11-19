@@ -4,7 +4,7 @@ import { ExternalLinkIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { cn } from "cn";
 
-import { FieldValue } from "@/features/resources/components/field-value";
+import { FieldValue } from "@/components/resource/field-value";
 import { useResourceContract } from "@/features/resources/queries";
 import type { Contract, Field } from "@/features/resources/types";
 import type { RecordId } from "@/lib/api/types";

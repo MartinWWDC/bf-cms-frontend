@@ -1,3 +1,5 @@
+import type { ComponentType } from "react";
+
 import type { AdminRef, PageMeta, RecordId, Reference, Tone, Translated } from "@/lib/api/types";
 
 /**
@@ -517,3 +519,19 @@ export interface TranslationSuggestion {
 /* ---------- Exports ---------- */
 
 export type ExportFormat = "csv" | "xlsx";
+
+/* ---------- Custom screens ---------- */
+
+/** What a custom-built screen gets. It loads its own data from the record's `screen` endpoint. */
+export interface RecordScreenProps {
+  contract: Contract;
+  record: RecordDetail;
+  onOpenRecord: (resource: string, id: RecordId) => void;
+  /** Opens the normal action dialog for one of the record's actions. */
+  onRunAction: (actionKey: string, initialInput?: Record<string, unknown>) => void;
+  /** Closes the drawer and opens another record of the same resource (moderation "next"). */
+  onShowRecord: (id: RecordId) => void;
+}
+
+/** Custom screens by resource key, supplied by the page. The generic layout is the fallback. */
+export type ScreenRegistry = Record<string, ComponentType<RecordScreenProps>>;

@@ -14,7 +14,7 @@ import type { RecordId } from "@/lib/api/types";
 import { getField } from "../lib/contract";
 import { useHistory } from "../queries";
 import type { Contract, HistoryEntry } from "../types";
-import { FieldValue } from "./field-value";
+import { FieldValue } from "@/components/resource/field-value";
 
 /** Entry types of `conventions.md` section 7, History. A type added later shows its own name. */
 const KNOWN_TYPES = [

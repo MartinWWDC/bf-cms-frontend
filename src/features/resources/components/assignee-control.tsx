@@ -9,7 +9,7 @@ import { useErrorToast } from "@/lib/api/use-error-message";
 
 import { useAssignRecord } from "../mutations";
 import type { Contract, RecordDetail } from "../types";
-import { StaffPicker } from "./pickers";
+import { StaffPicker } from "@/components/resource/pickers";
 
 interface AssigneeControlProps {
   contract: Contract;

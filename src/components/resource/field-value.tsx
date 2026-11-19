@@ -20,7 +20,7 @@ import {
 import { initials } from "@/lib/format";
 import { htmlToText } from "@/lib/sanitize-html";
 
-import type { ActionInput, Field } from "../types";
+import type { ActionInput, Field } from "@/features/resources/types";
 
 /** What `FieldValue` needs to know about a field. Action inputs have the same parts. */
 export type FieldLike = Pick<Field, "name" | "type" | "config"> &

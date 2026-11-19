@@ -6,7 +6,7 @@ import { TriangleAlertIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { Button, buttonVariants } from "@/components/ui/button";
-import { ActionDialog, type ActionRun } from "@/features/resources/components/action-dialog";
+import { ActionDialog, type ActionRun } from "@/components/resource/action-dialog";
 import { useResourceContract } from "@/features/resources/queries";
 import { useErrorMessage } from "@/lib/api/use-error-message";
 import { recordHref } from "@/lib/routes";

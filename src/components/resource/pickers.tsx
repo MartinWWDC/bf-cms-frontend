@@ -6,8 +6,8 @@ import { useLocale, useTranslations } from "next-intl";
 import { type PickerOption, SearchPicker } from "@/components/search-picker";
 import type { RecordId, Translated } from "@/lib/api/types";
 
-import { getRecordTitle } from "../lib/contract";
-import { useResourceContract, useResourceRecords, useStaff } from "../queries";
+import { getRecordTitle } from "@/features/resources/lib/contract";
+import { useResourceContract, useResourceRecords, useStaff } from "@/features/resources/queries";
 import { pickTranslation } from "./field-value";
 
 interface PickerBaseProps {
