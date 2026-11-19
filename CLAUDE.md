@@ -6,7 +6,7 @@
 
 `bf-cms-frontend` is the internal CMS / admin frontend for BikeFlip, a used bike marketplace (bikes, components, clothing). It is used by staff, not by the public. It deploys to Vercel from `main`.
 
-The project is at an early stage: the app shell and a generic resource screen exist and run on mock data. There is no auth and no real API connection yet.
+The app talks to the real CMS API: login with two-factor, the navigation, the generic contract-driven resource screens and the fixed pages (roles, staff, audit, tasks, dashboards, assistant, warehouse scan). There is no mock data: without a reachable API (`NEXT_PUBLIC_CMS_API_URL`) only the login page renders. The API is not deployed on dev yet, so the screens were built from `cms/docs` and the backend code and still need a pass against real data.
 
 ## Related projects
 
@@ -21,7 +21,7 @@ Sibling checkouts, readable from this session (see `.claude/settings.json`). Tre
 
 **Living plan:** "Custom CMS Build Plan" — https://claude.ai/artifact/4EMeA9kA9VspRx6VyR1RGW
 
-The plan is updated often and is the authority on backend status, decisions and frontend tasks. Read it with the Artifact tool (`action: "read"`, not a web fetch) before starting any work that touches auth, the API, the resource contract or screen behaviour. The summary below is a snapshot of Draft 4 (18 Nov 2026) and may be stale: if the plan differs, the plan wins — follow it and update this section.
+The plan is updated often and is the authority on backend status, decisions and frontend tasks. Read it with the Artifact tool (`action: "read"`, not a web fetch) before starting any work that touches auth, the API, the resource contract or screen behaviour. The summary below is a snapshot of Draft 5 (19 Nov 2026) and may be stale: if the plan differs, the plan wins — follow it and update this section.
 
 This app replaces Nova and Airtable. How the backend works, per the plan:
 
@@ -32,8 +32,10 @@ This app replaces Nova and Airtable. How the backend works, per the plan:
 - **Editing.** Detail drawer, with row versions for stale-save protection. Page-number paging with capped totals on large tables.
 - **Sensitive data** is masked by default; revealing needs a permission and is logged.
 - **Money actions** (refund, payout) need a risk warning, a mandatory reason and a confirmation.
+- **Actions** carry an `Idempotency-Key`; a preview returns risk flags (warnings must be acknowledged, blocking ones stop the action); actions on many records and exports are queued jobs.
+- **Fixed pages** come from the navigation as `page` nodes: `roles`, `staff`, `audit`, `tasks`, `dashboards/{key}`. Everything else is a resource `view`.
 
-The source of truth for shapes is `cms/docs` (`conventions.md`, `field-types.md`) on backend branch `project/P-BIK-77/custom-cms`. If that branch is not checked out in `../bf-backend`, the docs are not available: do not invent endpoints, payloads or field types — ask.
+The source of truth for shapes is `cms/docs` (`conventions.md`, `field-types.md`, `openapi.json`, `changelog.md`, plus one workflow page per custom screen) on backend branch `project/P-BIK-77/custom-cms`. Types in `src/lib/api/types.ts` and each feature's `types.ts` are written by hand from `openapi.json`; when the changelog lists a change, update them. If that branch is not checked out in `../bf-backend`, the docs are not available: do not invent endpoints, payloads or field types — ask.
 
 ## Stack
 
@@ -43,7 +45,7 @@ The source of truth for shapes is `cms/docs` (`conventions.md`, `field-types.md`
 - Class merging: `cn` from `@/lib/utils` (the `cn` package, not clsx + tailwind-merge)
 - TanStack Query v5 for server state; client and defaults in `src/lib/query-client.ts`, mounted in `src/components/providers.tsx`
 - TanStack Table **v9** for data tables. The API differs from v8 (`useTable`, `tableFeatures`, `table.FlexRender`); read `node_modules/@tanstack/react-table/skills/` before writing table code
-- Axios client for the CMS API in `src/lib/api/client.ts` (bearer token + `Accept-Language`, base `NEXT_PUBLIC_CMS_API_URL/cms/v1`)
+- Axios client for the CMS API in `src/lib/api/client.ts` (bearer token + `Accept-Language` + `X-Timezone`, base `NEXT_PUBLIC_CMS_API_URL/cms/v1`). Every failed request is an `ApiError` (`code`, `message`, `fields`, `details`, `requestId`); show it with `useErrorMessage()` / `useErrorToast()` / `<ErrorState>`. The token lives in `src/lib/api/auth-token.ts`
 - next-intl for translations, used client-side without locale routing: messages in `messages/{en,de,it,es,fr}.json`, provider and helpers in `src/i18n/`
 
 Environment variables are listed in `.env.example`.
@@ -54,21 +56,24 @@ More specific conventions live in `.claude/rules/` and load when matching files 
 
 ```
 src/
-  app/(cms)/            signed-in routes, wrapped in the app shell. Login will live outside this group.
+  app/login/            sign-in (password, two-factor, first-time setup)
+  app/(cms)/            signed-in routes, wrapped in the auth gate and the app shell
+  app/(cms)/r/[resource]/[[...view]]/  the generic screen of any resource
   components/ui/        shadcn primitives (generated)
-  components/layout/    app shell: header, sidebar, menu search, user menu
+  components/layout/    app shell: header, sidebar, menu search, user menu, page header, no-access page
   components/data-table/ generic TanStack Table (presentation only, knows nothing about resources)
   features/<feature>/   types.ts, api/, queries/, mutations/, hooks/, lib/, components/
   i18n/                 language config, provider, locale store, useFormat
   lib/                  API client, query client, small helpers
-  mocks/                mock data, used only by features' api/ files
 messages/               one JSON file per language; en.json is the source of truth
 ```
 
-- `features/resources` is the generic, contract-driven screen: `ResourceView` renders the list, toolbar, paging and detail drawer for any resource from its contract. `(cms)/page.tsx` shows it for the mock `orders` resource.
-- `features/navigation` and `features/session` feed the sidebar and the user menu.
-- **Everything is mocked for now.** The shapes in each feature's `types.ts` are provisional placeholders, not the real contract. Each mocked function in `features/*/api/` is marked `MOCK`.
-- List state (page, sort, search, tab, open record) lives in the URL: `features/resources/hooks/use-list-state.ts`.
+- `features/resources` is the generic, contract-driven screen: `ResourceView` renders the list (tabs, search, filter builder, grouping, totals, columns, saved views, selection), and `RecordDrawer` one record (sections, related lists, notes, history, edit form, actions) for any resource from its contract. `FieldValue` and `FieldInput` are the only places that know the field types; `ActionDialog` runs every action.
+- A resource with `detail.custom_endpoint` can get a custom-built screen: a component per resource key, registered in `app/(cms)/r/[resource]/[[...view]]/resource-screen.tsx` and shown as the drawer's first tab.
+- `features/navigation` is the menu and the route guard (`RouteGuard`): a route that is not in `GET /navigation` renders the no-access page. `features/session` is login, `/me`, sessions and permissions.
+- Links inside the app are built in `src/lib/routes.ts` (`resourceHref`, `recordHref`, `pageHref`), never by hand.
+- List state (tab, page, sort, search, filter, grouping, totals, saved view, columns, open record) lives in the URL: `features/resources/hooks/use-list-state.ts`.
+- Background jobs started in the tab are followed in the job tray (`features/jobs`, `trackJob`).
 - Theme: an ink frame (header + sidebar) around a paper content sheet; BikeFlip coral (`--brand`) is a signal colour only. Tokens are in `src/app/globals.css`.
 
 ## Commands

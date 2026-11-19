@@ -39,6 +39,14 @@ interface DataTableProps<TData extends RowData> {
   /** Rows of skeleton shown while loading. */
   skeletonRows?: number;
   emptyState?: ReactNode;
+  /**
+   * Shows a heading row wherever the group of consecutive rows changes. The rows must
+   * already arrive ordered by group, as a grouped list from the server does.
+   */
+  grouping?: {
+    getGroupKey: (row: TData) => string;
+    renderGroup: (key: string, firstRow: TData) => ReactNode;
+  };
   className?: string;
 }
 
@@ -72,6 +80,7 @@ export function DataTable<TData extends RowData>({
   isFetching = false,
   skeletonRows = 12,
   emptyState,
+  grouping,
   className,
 }: DataTableProps<TData>) {
   const t = useTranslations("table");
@@ -153,9 +162,13 @@ export function DataTable<TData extends RowData>({
                   ))}
                 </tr>
               ))
-            : rows.map((row) => {
+            : rows.map((row, rowIndex) => {
                 const isActive = row.id === activeRowId;
-                return (
+                const groupKey = grouping?.getGroupKey(row.original);
+                const startsGroup =
+                  grouping !== undefined &&
+                  (rowIndex === 0 || grouping.getGroupKey(rows[rowIndex - 1].original) !== groupKey);
+                const dataRow = (
                   <tr
                     key={row.id}
                     data-active={isActive || undefined}
@@ -198,6 +211,19 @@ export function DataTable<TData extends RowData>({
                     })}
                   </tr>
                 );
+                if (!startsGroup || !grouping) return dataRow;
+                return [
+                  <tr key={`group-${groupKey}-${row.id}`}>
+                    <th
+                      scope="colgroup"
+                      colSpan={visibleColumnCount}
+                      className="border-b bg-muted/60 px-4 py-1.5 text-left text-xs font-medium"
+                    >
+                      {grouping.renderGroup(groupKey as string, row.original)}
+                    </th>
+                  </tr>,
+                  dataRow,
+                ];
               })}
         </tbody>
       </table>

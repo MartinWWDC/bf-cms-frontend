@@ -5,6 +5,9 @@ import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 import { useSidebar } from "@/components/ui/sidebar";
+import { AssistantButton } from "@/features/assistant/components/assistant-button";
+import { NotificationBell } from "@/features/notifications/components/notification-bell";
+import { GlobalSearch } from "@/features/search/components/global-search";
 
 import { Brand } from "./brand";
 import { ThemeToggle } from "./theme-toggle";
@@ -35,10 +38,9 @@ export function AppHeader() {
       <Brand className="px-1 py-1" />
 
       <div className="ml-auto flex items-center gap-1">
-        <span className="mr-1 hidden items-center gap-1.5 rounded-sm border border-sidebar-border px-2 py-1 font-mono text-[0.625rem] tracking-widest uppercase sm:flex">
-          <span aria-hidden className="size-1.5 rounded-full bg-tone-warning" />
-          {t("mockData")}
-        </span>
+        <GlobalSearch className={frameButtonClass} />
+        <AssistantButton className={frameButtonClass} />
+        <NotificationBell className={frameButtonClass} />
         <ThemeToggle className={frameButtonClass} />
       </div>
     </header>

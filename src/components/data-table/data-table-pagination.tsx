@@ -4,6 +4,7 @@ import { ChevronLeftIcon, ChevronRightIcon, ChevronsLeftIcon, ChevronsRightIcon 
 import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
+import { useFormat } from "@/i18n/use-format";
 import {
   Select,
   SelectContent,
@@ -17,6 +18,10 @@ interface DataTablePaginationProps {
   page: number;
   pageSize: number;
   total: number;
+  /** The count stopped at a cap (big resources): shown as "10,000+". */
+  totalCapped?: boolean;
+  /** Whether a next page exists. Always reliable, also when the total is capped. */
+  hasMore?: boolean;
   pageSizes: readonly number[];
   onPageChange: (page: number) => void;
   onPageSizeChange: (pageSize: number) => void;
@@ -28,6 +33,8 @@ export function DataTablePagination({
   page,
   pageSize,
   total,
+  totalCapped = false,
+  hasMore,
   pageSizes,
   onPageChange,
   onPageSizeChange,
@@ -36,17 +43,18 @@ export function DataTablePagination({
   const t = useTranslations("table");
   const pageCount = Math.max(1, Math.ceil(total / pageSize));
   const from = total === 0 ? 0 : (page - 1) * pageSize + 1;
-  const to = Math.min(total, page * pageSize);
+  const to = totalCapped ? page * pageSize : Math.min(total, page * pageSize);
   const isFirst = page <= 1;
-  const isLast = page >= pageCount;
+  const isLast = hasMore === undefined ? page >= pageCount : !hasMore;
+  const format = useFormat();
 
   return (
     <div className="flex shrink-0 flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t bg-card px-4 py-2">
       <p className="font-mono text-xs text-muted-foreground tabular-nums">
-        {t.rich("range", {
-          from,
-          to,
-          total,
+        {t.rich(totalCapped ? "rangeCapped" : "range", {
+          from: format.number(from),
+          to: format.number(Math.max(to, from)),
+          total: format.number(total),
           range: (chunks) => <span className="text-foreground">{chunks}</span>,
         })}
       </p>
@@ -93,7 +101,8 @@ export function DataTablePagination({
             <ChevronLeftIcon />
           </Button>
           <span className="min-w-20 text-center font-mono text-xs text-muted-foreground tabular-nums">
-            <span className="text-foreground">{page}</span> / {pageCount}
+            <span className="text-foreground">{page}</span>
+            {totalCapped ? null : <> / {pageCount}</>}
           </span>
           <Button
             variant="outline"
@@ -109,7 +118,7 @@ export function DataTablePagination({
             size="icon-sm"
             className="hidden sm:inline-flex"
             aria-label={t("lastPage")}
-            disabled={disabled || isLast}
+            disabled={disabled || isLast || totalCapped}
             onClick={() => onPageChange(pageCount)}
           >
             <ChevronsRightIcon />

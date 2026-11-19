@@ -1,9 +1,12 @@
-import { mockDelay } from "@/mocks/delay";
-import { mockNavigation } from "@/mocks/navigation";
+import { getData } from "@/lib/api/client";
 
-import type { NavGroup } from "../types";
+import type { NavBadges, NavNode } from "../types";
 
-/** MOCK. Replace the body with `api.get("/navigation")` once the endpoint is reachable. */
-export function fetchNavigation(): Promise<NavGroup[]> {
-  return mockDelay(mockNavigation, 250);
+export function fetchNavigation(): Promise<NavNode[]> {
+  return getData<NavNode[]>("/navigation");
+}
+
+/** Kept apart from the navigation so that the tree stays cacheable. */
+export function fetchNavigationBadges(): Promise<NavBadges> {
+  return getData<NavBadges>("/navigation/badges");
 }

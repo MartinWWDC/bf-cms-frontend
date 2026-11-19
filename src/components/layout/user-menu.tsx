@@ -1,10 +1,11 @@
 "use client";
 
-import { ChevronsUpDownIcon, LanguagesIcon, LogOutIcon, MonitorSmartphoneIcon, UserRoundIcon } from "lucide-react";
+import { useState } from "react";
+import Link from "next/link";
+import { ChevronsUpDownIcon, ClipboardListIcon, KeyRoundIcon, LanguagesIcon, LogOutIcon, MonitorSmartphoneIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { toast } from "sonner";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,20 +22,31 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
+import { RecoveryCodesDialog } from "@/features/session/components/recovery-codes-dialog";
+import { useLogout, useUpdateLocale } from "@/features/session/mutations";
 import { useMe } from "@/features/session/queries";
+import { WarehouseMenuItem } from "@/features/warehouse/components/warehouse-menu-item";
 import { isLocale } from "@/i18n/config";
 import { useLocaleSwitcher } from "@/i18n/use-locale-switcher";
+import { useErrorToast } from "@/lib/api/use-error-message";
 import { initials } from "@/lib/format";
+import { routes } from "@/lib/routes";
 
 /** The signed-in admin, with the account menu. Sits in the sidebar footer. */
 export function UserMenu() {
   const { data: admin } = useMe();
   const { isMobile } = useSidebar();
   const t = useTranslations("userMenu");
-  const tCommon = useTranslations("common");
   const { locale, locales, localeNames, setLocale } = useLocaleSwitcher();
+  const logout = useLogout();
+  const updateLocale = useUpdateLocale();
+  const toastError = useErrorToast();
+  const [recoveryOpen, setRecoveryOpen] = useState(false);
 
-  const notConnected = (label: string) => () => toast.info(tCommon("notConnected", { label }));
+  // The choice is saved on the backend first: from then on it decides the language of
+  // every label and message the API returns.
+  const changeLocale = (next: (typeof locales)[number]) =>
+    updateLocale.mutate(next, { onSuccess: () => setLocale(next), onError: toastError });
 
   if (!admin) {
     return (
@@ -50,7 +62,6 @@ export function UserMenu() {
 
   const avatar = (
     <Avatar className="after:hidden">
-      {admin.avatarUrl ? <AvatarImage src={admin.avatarUrl} alt="" /> : null}
       <AvatarFallback className="bg-brand font-mono text-xs font-medium text-brand-foreground">
         {initials(admin.name)}
       </AvatarFallback>
@@ -67,7 +78,7 @@ export function UserMenu() {
             {avatar}
             <span className="grid min-w-0 flex-1 text-left leading-tight">
               <span className="truncate text-sm font-medium text-sidebar-accent-foreground">{admin.name}</span>
-              <span className="truncate text-xs text-sidebar-foreground/70">{admin.roles[0] ?? admin.email}</span>
+              <span className="truncate text-xs text-sidebar-foreground/70">{admin.is_super_admin ? t("superAdmin") : (admin.roles[0] ?? admin.email)}</span>
             </span>
             <ChevronsUpDownIcon className="ml-auto opacity-60" />
           </DropdownMenuTrigger>
@@ -89,10 +100,6 @@ export function UserMenu() {
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem onClick={notConnected(t("profile"))}>
-                <UserRoundIcon />
-                {t("profile")}
-              </DropdownMenuItem>
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger>
                   <LanguagesIcon />
@@ -103,7 +110,7 @@ export function UserMenu() {
                   <DropdownMenuRadioGroup
                     value={locale}
                     onValueChange={(value) => {
-                      if (isLocale(value)) setLocale(value);
+                      if (isLocale(value) && value !== locale) changeLocale(value);
                     }}
                   >
                     {locales.map((code) => (
@@ -114,20 +121,30 @@ export function UserMenu() {
                   </DropdownMenuRadioGroup>
                 </DropdownMenuSubContent>
               </DropdownMenuSub>
-              <DropdownMenuItem onClick={notConnected(t("sessions"))}>
+              <DropdownMenuItem render={<Link href={routes.sessions} />}>
                 <MonitorSmartphoneIcon />
                 {t("sessions")}
+              </DropdownMenuItem>
+              <DropdownMenuItem render={<Link href={routes.jobs} />}>
+                <ClipboardListIcon />
+                {t("jobs")}
+              </DropdownMenuItem>
+              <WarehouseMenuItem />
+              <DropdownMenuItem onClick={() => setRecoveryOpen(true)}>
+                <KeyRoundIcon />
+                {t("recoveryCodes")}
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem onClick={notConnected(t("signOut"))}>
+              <DropdownMenuItem disabled={logout.isPending} onClick={() => logout.mutate()}>
                 <LogOutIcon />
                 {t("signOut")}
               </DropdownMenuItem>
             </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>
+        <RecoveryCodesDialog open={recoveryOpen} onOpenChange={setRecoveryOpen} />
       </SidebarMenuItem>
     </SidebarMenu>
   );

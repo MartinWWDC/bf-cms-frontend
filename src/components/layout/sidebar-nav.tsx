@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { ChevronRightIcon } from "lucide-react";
+import { usePathname, useSearchParams } from "next/navigation";
+import { BookmarkIcon, ChevronRightIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { cn } from "cn";
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import {
@@ -21,9 +22,17 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { getNavIcon } from "@/features/navigation/lib/nav-icons";
-import { filterNavigation, isHrefActive, isItemActive } from "@/features/navigation/lib/navigation-utils";
-import { useNavigation } from "@/features/navigation/queries";
-import type { NavItem } from "@/features/navigation/types";
+import {
+  containsLeaf,
+  filterNavigation,
+  findActiveLeaf,
+  nodeHref,
+} from "@/features/navigation/lib/navigation-utils";
+import { useNavigation, useNavigationBadges } from "@/features/navigation/queries";
+import type { NavBadges, NavGroupNode, NavLeafNode, NavNode } from "@/features/navigation/types";
+import { useFormat } from "@/i18n/use-format";
+import type { Tone } from "@/lib/api/types";
+import { resourceHref } from "@/lib/routes";
 
 import { SidebarNavSkeleton } from "./sidebar-nav-skeleton";
 
@@ -31,8 +40,15 @@ import { SidebarNavSkeleton } from "./sidebar-nav-skeleton";
 const activeMarkerClass =
   "relative data-active:before:absolute data-active:before:inset-y-2 data-active:before:left-0 data-active:before:w-0.5 data-active:before:rounded-full data-active:before:bg-brand";
 
-const badgeClass =
-  "rounded-sm bg-sidebar-accent px-1.5 font-mono text-[0.625rem] text-sidebar-accent-foreground";
+const badgeClass = "rounded-sm px-1.5 font-mono text-[0.625rem] tabular-nums";
+
+const BADGE_TONE: Record<Tone, string> = {
+  neutral: "bg-sidebar-accent text-sidebar-accent-foreground",
+  info: "bg-tone-info/20 text-sidebar-accent-foreground",
+  success: "bg-tone-success/20 text-sidebar-accent-foreground",
+  warning: "bg-tone-warning/25 text-sidebar-accent-foreground",
+  danger: "bg-tone-danger/25 text-sidebar-accent-foreground",
+};
 
 interface SidebarNavProps {
   /** Text typed in the menu search. Empty shows the full menu. */
@@ -40,22 +56,23 @@ interface SidebarNavProps {
 }
 
 /**
- * The sidebar menu, rendered from navigation data (groups → items → sub-items).
- * Adding, removing or reordering entries is a data change; this component does not change.
+ * The sidebar menu, rendered from `GET /navigation`: groups to any depth, resource views
+ * and fixed pages. The tree is already filtered by the backend to what the admin may see.
  */
 export function SidebarNav({ query }: SidebarNavProps) {
   const { data: navigation, isPending, isError, refetch } = useNavigation();
+  const { data: badges } = useNavigationBadges(navigation !== undefined);
   const pathname = usePathname();
+  const activeSavedView = useSearchParams().get("saved");
   const t = useTranslations("shell");
   const tCommon = useTranslations("common");
+  const format = useFormat();
   const { isMobile, state, setOpen, setOpenMobile } = useSidebar();
   // Sections the admin opened or closed by hand. Until touched, a section is open when it
   // contains the current page.
   const [toggled, setToggled] = useState<Record<string, boolean>>({});
 
-  if (isPending) {
-    return <SidebarNavSkeleton />;
-  }
+  if (isPending) return <SidebarNavSkeleton />;
 
   if (isError) {
     return (
@@ -70,13 +87,22 @@ export function SidebarNav({ query }: SidebarNavProps) {
 
   const trimmedQuery = query.trim();
   const isSearching = trimmedQuery !== "";
-  const groups = filterNavigation(navigation, trimmedQuery);
+  const nodes = filterNavigation(navigation, trimmedQuery);
+  const activeKey = findActiveLeaf(navigation, pathname)?.key;
   const isCollapsed = state === "collapsed" && !isMobile;
   const closeMobileMenu = () => {
     if (isMobile) setOpenMobile(false);
   };
 
-  if (groups.length === 0) {
+  if (navigation.length === 0) {
+    return (
+      <p className="px-4 py-6 text-sm text-sidebar-foreground/70 group-data-[collapsible=icon]:hidden">
+        {t("menuEmpty")}
+      </p>
+    );
+  }
+
+  if (nodes.length === 0) {
     return (
       <p className="px-4 py-6 text-sm text-sidebar-foreground/70 group-data-[collapsible=icon]:hidden">
         {t.rich("menuNoMatches", {
@@ -87,42 +113,110 @@ export function SidebarNav({ query }: SidebarNavProps) {
     );
   }
 
-  const renderItem = (item: NavItem) => {
-    const Icon = getNavIcon(item.icon);
+  const badgeOf = (leaf: NavLeafNode, counts: NavBadges | undefined) => {
+    if (leaf.type !== "view" || !leaf.badge) return null;
+    const entry = counts?.[leaf.key];
+    if (!entry || entry.count === 0) return null;
+    return {
+      text: entry.capped ? t("badgeCapped", { count: format.number(entry.count) }) : format.number(entry.count),
+      className: cn(badgeClass, BADGE_TONE[leaf.badge.tone] ?? BADGE_TONE.neutral),
+    };
+  };
 
-    if (!item.children?.length) {
-      return (
-        <SidebarMenuItem key={item.id}>
-          <SidebarMenuButton
-            render={<Link href={item.href ?? "#"} onClick={closeMobileMenu} />}
-            isActive={isHrefActive(item.href, pathname)}
-            tooltip={item.label}
-            className={activeMarkerClass}
+  const savedViewLinks = (leaf: NavLeafNode) => {
+    if (leaf.type !== "view" || !leaf.saved_views?.length) return null;
+    return leaf.saved_views.map((view) => (
+      <SidebarMenuSubItem key={`${leaf.key}-saved-${view.id}`}>
+        <SidebarMenuSubButton
+          render={
+            <Link href={resourceHref(leaf.resource, leaf.view, { savedView: view.id })} onClick={closeMobileMenu} />
+          }
+          isActive={leaf.key === activeKey && activeSavedView === String(view.id)}
+          className="data-active:font-medium"
+        >
+          <BookmarkIcon className="size-3.5 opacity-60" />
+          <span>
+            <Highlight text={view.name} query={trimmedQuery} />
+          </span>
+        </SidebarMenuSubButton>
+      </SidebarMenuSubItem>
+    ));
+  };
+
+  /** A view or page at the first level of a section. */
+  const renderLeaf = (leaf: NavLeafNode) => {
+    const Icon = getNavIcon(leaf.icon);
+    const badge = badgeOf(leaf, badges);
+    const saved = savedViewLinks(leaf);
+    return (
+      <SidebarMenuItem key={leaf.key}>
+        <SidebarMenuButton
+          render={<Link href={nodeHref(leaf)} onClick={closeMobileMenu} />}
+          isActive={leaf.key === activeKey && !activeSavedView}
+          tooltip={leaf.label}
+          className={activeMarkerClass}
+        >
+          <Icon />
+          <span>
+            <Highlight text={leaf.label} query={trimmedQuery} />
+          </span>
+        </SidebarMenuButton>
+        {badge ? <SidebarMenuBadge className={badge.className}>{badge.text}</SidebarMenuBadge> : null}
+        {saved ? <SidebarMenuSub>{saved}</SidebarMenuSub> : null}
+      </SidebarMenuItem>
+    );
+  };
+
+  /** Everything inside an open section. Deeper groups become a small heading with their entries. */
+  const renderSubNodes = (children: NavNode[]) =>
+    children.map((child) => {
+      if (child.type === "group") {
+        return (
+          <li key={child.key} className="contents">
+            <ul className="contents">
+              <li className="px-2 pt-2 pb-0.5 font-mono text-[0.625rem] tracking-wider text-sidebar-foreground/50 uppercase">
+                <Highlight text={child.label} query={trimmedQuery} />
+              </li>
+              {renderSubNodes(child.children)}
+            </ul>
+          </li>
+        );
+      }
+      const badge = badgeOf(child, badges);
+      return [
+        <SidebarMenuSubItem key={child.key}>
+          <SidebarMenuSubButton
+            render={<Link href={nodeHref(child)} onClick={closeMobileMenu} />}
+            isActive={child.key === activeKey && !activeSavedView}
+            className="data-active:font-medium"
           >
-            <Icon />
             <span>
-              <Highlight text={item.label} query={trimmedQuery} />
+              <Highlight text={child.label} query={trimmedQuery} />
             </span>
-          </SidebarMenuButton>
-          {item.badge ? <SidebarMenuBadge className={badgeClass}>{item.badge}</SidebarMenuBadge> : null}
-        </SidebarMenuItem>
-      );
-    }
+            {badge ? <span className={cn("ml-auto", badge.className)}>{badge.text}</span> : null}
+          </SidebarMenuSubButton>
+        </SidebarMenuSubItem>,
+        savedViewLinks(child),
+      ];
+    });
 
-    const containsCurrentPage = isItemActive(item, pathname);
-    const isOpen = isSearching || (toggled[item.id] ?? containsCurrentPage);
+  /** A group inside a section: a collapsible entry. */
+  const renderGroup = (group: NavGroupNode) => {
+    const Icon = getNavIcon(group.icon);
+    const containsCurrentPage = containsLeaf(group, activeKey);
+    const isOpen = isSearching || (toggled[group.key] ?? containsCurrentPage);
 
     return (
       <Collapsible
-        key={item.id}
+        key={group.key}
         open={isOpen}
-        onOpenChange={(open) => setToggled((current) => ({ ...current, [item.id]: open }))}
+        onOpenChange={(open) => setToggled((current) => ({ ...current, [group.key]: open }))}
         render={<SidebarMenuItem />}
       >
         <CollapsibleTrigger
           render={
             <SidebarMenuButton
-              tooltip={item.label}
+              tooltip={group.label}
               // Collapsed to icons, a section cannot show its children: mark it instead.
               isActive={isCollapsed && containsCurrentPage}
               className={activeMarkerClass}
@@ -130,50 +224,52 @@ export function SidebarNav({ query }: SidebarNavProps) {
                 if (!isCollapsed) return;
                 // Expand the sidebar so the section's entries become reachable.
                 setOpen(true);
-                setToggled((current) => ({ ...current, [item.id]: false }));
+                setToggled((current) => ({ ...current, [group.key]: false }));
               }}
             />
           }
         >
           <Icon />
           <span>
-            <Highlight text={item.label} query={trimmedQuery} />
+            <Highlight text={group.label} query={trimmedQuery} />
           </span>
           <ChevronRightIcon className="ml-auto transition-transform duration-200 group-data-[collapsible=icon]:hidden in-data-panel-open:rotate-90" />
         </CollapsibleTrigger>
-
         <CollapsibleContent>
-          <SidebarMenuSub>
-            {item.children.map((child) => (
-              <SidebarMenuSubItem key={child.id}>
-                <SidebarMenuSubButton
-                  render={<Link href={child.href ?? "#"} onClick={closeMobileMenu} />}
-                  isActive={isHrefActive(child.href, pathname)}
-                  className="data-active:font-medium"
-                >
-                  <span>
-                    <Highlight text={child.label} query={trimmedQuery} />
-                  </span>
-                  {child.badge ? <span className={`ml-auto ${badgeClass}`}>{child.badge}</span> : null}
-                </SidebarMenuSubButton>
-              </SidebarMenuSubItem>
-            ))}
-          </SidebarMenuSub>
+          <SidebarMenuSub>{renderSubNodes(group.children)}</SidebarMenuSub>
         </CollapsibleContent>
       </Collapsible>
     );
   };
 
-  return groups.map((group) => (
-    <SidebarGroup key={group.id}>
-      <SidebarGroupLabel className="font-mono text-[0.625rem] tracking-[0.14em] text-sidebar-foreground/55 uppercase">
-        {group.label}
-      </SidebarGroupLabel>
-      <SidebarGroupContent>
-        <SidebarMenu>{group.items.map(renderItem)}</SidebarMenu>
-      </SidebarGroupContent>
-    </SidebarGroup>
-  ));
+  const renderEntries = (children: NavNode[]) =>
+    children.map((child) => (child.type === "group" ? renderGroup(child) : renderLeaf(child)));
+
+  // Entries outside any section (none today) are shown first, without a heading.
+  const looseLeaves = nodes.filter((node): node is NavLeafNode => node.type !== "group");
+  const sections = nodes.filter((node): node is NavGroupNode => node.type === "group");
+
+  return (
+    <>
+      {looseLeaves.length > 0 ? (
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>{looseLeaves.map(renderLeaf)}</SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      ) : null}
+      {sections.map((section) => (
+        <SidebarGroup key={section.key}>
+          <SidebarGroupLabel className="font-mono text-[0.625rem] tracking-[0.14em] text-sidebar-foreground/55 uppercase">
+            {section.label}
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>{renderEntries(section.children)}</SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      ))}
+    </>
+  );
 }
 
 /** Marks the part of a label that matches the menu search. */

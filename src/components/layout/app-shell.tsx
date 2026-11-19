@@ -1,6 +1,7 @@
 import type { CSSProperties, ReactNode } from "react";
 
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { JobTray } from "@/features/jobs/components/job-tray";
 
 import { AppHeader } from "./app-header";
 import { AppSidebar } from "./app-sidebar";
@@ -24,6 +25,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           {children}
         </SidebarInset>
       </div>
+      <JobTray />
     </SidebarProvider>
   );
 }
