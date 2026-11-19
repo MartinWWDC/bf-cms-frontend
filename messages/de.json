@@ -769,7 +769,12 @@
       "done": "Erledigt",
       "openForNote": "Datensatz öffnen, um sie hinzuzufügen",
       "openForAssignment": "Datensatz öffnen, um ihn zuzuweisen",
-      "hint": "Nichts ändert sich, bis du es selbst bestätigst."
+      "hint": "Nichts ändert sich, bis du es selbst bestätigst.",
+      "addNote": "Diese Notiz hinzufügen",
+      "confirmNote": "Ja, Notiz hinzufügen",
+      "applyAssignment": "Diese Zuweisung übernehmen",
+      "confirmAssignment": "Ja, Zuweisung ändern",
+      "cancel": "Abbrechen"
     },
     "usage": {
       "month": "Monat",
@@ -1172,5 +1177,15 @@
       "empty": "Gib oben Codes ein, um ihre Etiketten zu sehen.",
       "loadFailed": "Die Etiketten konnten nicht geladen werden"
     }
+  },
+  "docs": {
+    "title": "API-Dokumente",
+    "description": "Die Dokumente des bereitgestellten API-Builds. Sie entsprechen immer dem bereitgestellten Code.",
+    "menu": "API-Dokumente",
+    "documents": "Dokumente",
+    "empty": "Es sind keine Dokumente veröffentlicht.",
+    "loadFailed": "Das Dokument konnte nicht geladen werden",
+    "disabledTitle": "Die Dokumente sind hier nicht veröffentlicht",
+    "disabledHint": "Diese Umgebung stellt die API-Dokumente nicht bereit."
   }
 }

@@ -769,7 +769,12 @@
       "done": "Hecho",
       "openForNote": "Abrir el registro para añadirla",
       "openForAssignment": "Abrir el registro para asignarlo",
-      "hint": "Nada cambia hasta que lo confirmes tú."
+      "hint": "Nada cambia hasta que lo confirmes tú.",
+      "addNote": "Añadir esta nota",
+      "confirmNote": "Sí, añadir la nota",
+      "applyAssignment": "Aplicar esta asignación",
+      "confirmAssignment": "Sí, cambiar la asignación",
+      "cancel": "Cancelar"
     },
     "usage": {
       "month": "Mes",
@@ -1172,5 +1177,15 @@
       "empty": "Introduce códigos arriba para ver sus etiquetas.",
       "loadFailed": "No se pudieron cargar las etiquetas"
     }
+  },
+  "docs": {
+    "title": "Documentos de la API",
+    "description": "Los documentos de la versión desplegada de la API. Siempre coinciden con el código desplegado.",
+    "menu": "Documentos de la API",
+    "documents": "Documentos",
+    "empty": "No hay documentos publicados.",
+    "loadFailed": "No se pudo cargar el documento",
+    "disabledTitle": "Los documentos no están publicados aquí",
+    "disabledHint": "Este entorno no ofrece los documentos de la API."
   }
 }

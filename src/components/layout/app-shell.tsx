@@ -2,6 +2,7 @@ import type { CSSProperties, ReactNode } from "react";
 
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { JobTray } from "@/features/jobs/components/job-tray";
+import { LiveBridge } from "@/features/live/components/live-bridge";
 
 import { AppHeader } from "./app-header";
 import { AppSidebar } from "./app-sidebar";
@@ -26,6 +27,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </SidebarInset>
       </div>
       <JobTray />
+      <LiveBridge />
     </SidebarProvider>
   );
 }

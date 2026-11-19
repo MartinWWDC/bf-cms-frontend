@@ -64,7 +64,7 @@ import {
 } from "../lib/filters";
 import { buildResourceColumns, SELECT_COLUMN_ID } from "../lib/resource-columns";
 import { useAssignRecords, useExportRecords } from "../mutations";
-import { useAssignmentSummary, useResourceContract, useResourceRecords, useSavedViews } from "../queries";
+import { useAssignmentSummary, useResourceContract, useResourceRecords, useSavedViews, useTabCounts } from "../queries";
 import type {
   Action,
   BulkTarget,
@@ -74,6 +74,7 @@ import type {
   ListParams,
   ResourceRecord,
   SavedViewInput,
+  ViewTab,
 } from "../types";
 import { ActionDialog, type ActionRun } from "@/components/resource/action-dialog";
 import { FieldValue } from "@/components/resource/field-value";
@@ -86,6 +87,7 @@ import { SearchField } from "./search-field";
 // Stable fallbacks: a fresh `[]` or `{}` on every render would reset the table.
 const NO_ROWS: ResourceRecord[] = [];
 const NO_VISIBILITY: ColumnVisibilityState = {};
+const NO_TABS: ViewTab[] = [];
 const getRecordId = (record: ResourceRecord) => String(record.id);
 
 interface ResourceViewProps {
@@ -176,6 +178,7 @@ function ResourceList({ contract, viewKey, screens }: ResourceListProps) {
     [view?.key, tab?.key, activeSaved?.id, state],
   );
   const records = useResourceRecords(contract.key, params, { enabled: !wantsSaved || savedViews.isSuccess });
+  const tabCounts = useTabCounts(contract.key, view?.key, view?.tabs ?? NO_TABS);
   const rows = records.data?.data ?? NO_ROWS;
   const meta = records.data?.meta;
   const total = meta?.total ?? 0;
@@ -672,6 +675,13 @@ function ResourceList({ contract, viewKey, screens }: ResourceListProps) {
                   )}
                 >
                   {entry.label}
+                  {tabCounts[entry.key] ? (
+                    <span className="ml-1.5 rounded-sm bg-muted px-1 font-mono text-[0.625rem] text-muted-foreground tabular-nums">
+                      {tabCounts[entry.key].capped
+                        ? tTable("totalCapped", { total: format.number(tabCounts[entry.key].total) })
+                        : format.number(tabCounts[entry.key].total)}
+                    </span>
+                  ) : null}
                 </button>
               );
             })}

@@ -1,10 +1,10 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 
-import { resolveLink } from "./cms-links";
+import { resolveLink } from "@/lib/cms-links";
 
 /**
- * A small markdown renderer for assistant answers. It builds React elements only (never
+ * A small markdown renderer for assistant answers and the API documents. It builds React elements only (never
  * raw HTML), so whatever the model writes cannot inject markup. Supported: paragraphs,
  * line breaks, headings, bold, italic, inline code, code blocks, bullet and numbered
  * lists, links and simple tables. Anything else is shown as the text it is.

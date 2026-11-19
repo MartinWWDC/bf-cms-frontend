@@ -9,8 +9,8 @@ import { cn } from "cn";
 import { useFormat } from "@/i18n/use-format";
 
 import type { LiveStep } from "../hooks/use-chat";
-import { resolveLink } from "../lib/cms-links";
-import { renderMarkdown } from "../lib/markdown";
+import { resolveLink } from "@/lib/cms-links";
+import { renderMarkdown } from "@/components/markdown";
 import type { AssistantLink, AssistantMessage, AssistantProposal, AssistantStep } from "../types";
 import { ProposalCard } from "./proposal-card";
 

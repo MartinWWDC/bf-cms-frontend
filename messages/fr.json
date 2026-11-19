@@ -769,7 +769,12 @@
       "done": "Terminé",
       "openForNote": "Ouvrir l'enregistrement pour l'ajouter",
       "openForAssignment": "Ouvrir l'enregistrement pour l'attribuer",
-      "hint": "Rien ne change tant que vous ne confirmez pas vous-même."
+      "hint": "Rien ne change tant que vous ne confirmez pas vous-même.",
+      "addNote": "Ajouter cette note",
+      "confirmNote": "Oui, ajouter la note",
+      "applyAssignment": "Appliquer cette attribution",
+      "confirmAssignment": "Oui, modifier l'attribution",
+      "cancel": "Annuler"
     },
     "usage": {
       "month": "Mois",
@@ -1172,5 +1177,15 @@
       "empty": "Saisissez des codes ci-dessus pour voir leurs étiquettes.",
       "loadFailed": "Impossible de charger les étiquettes"
     }
+  },
+  "docs": {
+    "title": "Documents de l'API",
+    "description": "Les documents de la version déployée de l'API. Ils correspondent toujours au code déployé.",
+    "menu": "Documents de l'API",
+    "documents": "Documents",
+    "empty": "Aucun document n'est publié.",
+    "loadFailed": "Impossible de charger le document",
+    "disabledTitle": "Les documents ne sont pas publiés ici",
+    "disabledHint": "Cet environnement ne fournit pas les documents de l'API."
   }
 }

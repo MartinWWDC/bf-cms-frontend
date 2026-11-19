@@ -9,3 +9,4 @@ export { useResourceRecord } from "./use-resource-record";
 export { useResourceRecords } from "./use-resource-records";
 export { useSavedViews } from "./use-saved-views";
 export { useStaff } from "./use-staff";
+export { type TabCount, useTabCounts } from "./use-tab-counts";

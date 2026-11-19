@@ -769,7 +769,12 @@
       "done": "Fatto",
       "openForNote": "Apri il record per aggiungerla",
       "openForAssignment": "Apri il record per assegnarlo",
-      "hint": "Nulla cambia finché non lo confermi tu."
+      "hint": "Nulla cambia finché non lo confermi tu.",
+      "addNote": "Aggiungi questa nota",
+      "confirmNote": "Sì, aggiungi la nota",
+      "applyAssignment": "Applica questa assegnazione",
+      "confirmAssignment": "Sì, cambia l'assegnatario",
+      "cancel": "Annulla"
     },
     "usage": {
       "month": "Mese",
@@ -1172,5 +1177,15 @@
       "empty": "Inserisci i codici qui sopra per vederne le etichette.",
       "loadFailed": "Impossibile caricare le etichette"
     }
+  },
+  "docs": {
+    "title": "Documenti API",
+    "description": "I documenti della build API distribuita. Corrispondono sempre al codice distribuito.",
+    "menu": "Documenti API",
+    "documents": "Documenti",
+    "empty": "Nessun documento pubblicato.",
+    "loadFailed": "Impossibile caricare il documento",
+    "disabledTitle": "I documenti non sono pubblicati qui",
+    "disabledHint": "Questo ambiente non fornisce i documenti API."
   }
 }

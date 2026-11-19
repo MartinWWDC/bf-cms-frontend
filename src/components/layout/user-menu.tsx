@@ -25,6 +25,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { RecoveryCodesDialog } from "@/features/session/components/recovery-codes-dialog";
 import { useLogout, useUpdateLocale } from "@/features/session/mutations";
 import { useMe } from "@/features/session/queries";
+import { DocsMenuItem } from "@/features/docs/components/docs-menu-item";
 import { WarehouseMenuItem } from "@/features/warehouse/components/warehouse-menu-item";
 import { isLocale } from "@/i18n/config";
 import { useLocaleSwitcher } from "@/i18n/use-locale-switcher";
@@ -130,6 +131,7 @@ export function UserMenu() {
                 {t("jobs")}
               </DropdownMenuItem>
               <WarehouseMenuItem />
+              <DocsMenuItem />
               <DropdownMenuItem onClick={() => setRecoveryOpen(true)}>
                 <KeyRoundIcon />
                 {t("recoveryCodes")}

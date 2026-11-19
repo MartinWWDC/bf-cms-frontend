@@ -769,7 +769,12 @@
       "done": "Done",
       "openForNote": "Open the record to add it",
       "openForAssignment": "Open the record to assign it",
-      "hint": "Nothing changes until you confirm it yourself."
+      "hint": "Nothing changes until you confirm it yourself.",
+      "addNote": "Add this note",
+      "confirmNote": "Yes, add the note",
+      "applyAssignment": "Apply this assignment",
+      "confirmAssignment": "Yes, change the assignee",
+      "cancel": "Cancel"
     },
     "usage": {
       "month": "Month",
@@ -1172,5 +1177,15 @@
       "empty": "Enter codes above to see their labels.",
       "loadFailed": "The labels could not be loaded"
     }
+  },
+  "docs": {
+    "title": "API documents",
+    "description": "The documents of the deployed API build. They always match the deployed code.",
+    "menu": "API documents",
+    "documents": "Documents",
+    "empty": "No documents are published.",
+    "loadFailed": "The document could not be loaded",
+    "disabledTitle": "The documents are not published here",
+    "disabledHint": "This environment does not serve the API documents."
   }
 }

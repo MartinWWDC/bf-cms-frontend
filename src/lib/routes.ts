@@ -47,6 +47,7 @@ export const routes = {
   login: "/login",
   sessions: "/account/sessions",
   jobs: "/jobs",
+  docs: "/docs",
   tasks: "/tasks",
   assistant: "/assistant",
   warehouseScan: "/warehouse/scan",

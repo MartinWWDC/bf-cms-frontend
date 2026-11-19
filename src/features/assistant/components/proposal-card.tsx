@@ -7,8 +7,9 @@ import { useTranslations } from "next-intl";
 
 import { Button, buttonVariants } from "@/components/ui/button";
 import { ActionDialog, type ActionRun } from "@/components/resource/action-dialog";
+import { useAssignRecord, useCreateNote } from "@/features/resources/mutations";
 import { useResourceContract } from "@/features/resources/queries";
-import { useErrorMessage } from "@/lib/api/use-error-message";
+import { useErrorMessage, useErrorToast } from "@/lib/api/use-error-message";
 import { recordHref } from "@/lib/routes";
 
 import type { AssistantProposal } from "../types";
@@ -16,8 +17,8 @@ import type { AssistantProposal } from "../types";
 /**
  * A change the assistant suggests. Nothing happens here: "Review" opens the normal action
  * dialog prefilled with the proposal, where every normal rule applies (permission,
- * preview, reason, confirmation, risk flags, audit). A note or an assignment is done on
- * the record itself.
+ * preview, reason, confirmation, risk flags, audit). A note or an assignment is sent
+ * with the normal note and assignment requests after the admin confirms it here.
  */
 export function ProposalCard({ proposal }: { proposal: AssistantProposal }) {
   const t = useTranslations("assistant.proposals");
@@ -45,6 +46,32 @@ export function ProposalCard({ proposal }: { proposal: AssistantProposal }) {
       : null;
 
   const noteText = typeof proposal.input.body === "string" ? proposal.input.body : null;
+  // A note or an assignment is sent from here, but only after the admin confirms it:
+  // the assistant itself never changes anything.
+  const toastError = useErrorToast();
+  const [confirming, setConfirming] = useState(false);
+  const createNote = useCreateNote(proposal.resource, proposal.record_id);
+  const assign = useAssignRecord(proposal.resource);
+  const sending = createNote.isPending || assign.isPending;
+  const assigneeId = typeof proposal.input.admin_id === "number" ? proposal.input.admin_id : null;
+  const send = () => {
+    const handlers = {
+      onSuccess: () => {
+        setDone(true);
+        setConfirming(false);
+      },
+      onError: toastError,
+    };
+    if (proposal.kind === "note" && noteText) {
+      createNote.mutate(
+        { body: noteText, format: proposal.input.format === "rich" ? "rich" : "plain" },
+        handlers,
+      );
+    } else if (proposal.kind === "assignment") {
+      assign.mutate({ id: proposal.record_id, adminId: assigneeId }, handlers);
+    }
+  };
+  const canSend = proposal.kind === "assignment" || (proposal.kind === "note" && noteText !== null);
   const title =
     proposal.kind === "note"
       ? t("noteTitle")
@@ -98,12 +125,32 @@ export function ProposalCard({ proposal }: { proposal: AssistantProposal }) {
             {done ? t("done") : reviewing && contract.isPending ? t("loading") : t("review")}
           </Button>
         ) : (
-          <Link
-            href={recordHref(proposal.resource, proposal.record_id)}
-            className={buttonVariants({ size: "sm", variant: "outline" })}
-          >
-            {proposal.kind === "note" ? t("openForNote") : t("openForAssignment")}
-          </Link>
+          <>
+            {done ? (
+              <Button size="sm" disabled>
+                {t("done")}
+              </Button>
+            ) : confirming ? (
+              <>
+                <Button size="sm" disabled={sending} onClick={send}>
+                  {proposal.kind === "note" ? t("confirmNote") : t("confirmAssignment")}
+                </Button>
+                <Button size="sm" variant="ghost" disabled={sending} onClick={() => setConfirming(false)}>
+                  {t("cancel")}
+                </Button>
+              </>
+            ) : canSend ? (
+              <Button size="sm" onClick={() => setConfirming(true)}>
+                {proposal.kind === "note" ? t("addNote") : t("applyAssignment")}
+              </Button>
+            ) : null}
+            <Link
+              href={recordHref(proposal.resource, proposal.record_id)}
+              className={buttonVariants({ size: "sm", variant: "outline" })}
+            >
+              {proposal.kind === "note" ? t("openForNote") : t("openForAssignment")}
+            </Link>
+          </>
         )}
         <span className="text-xs text-muted-foreground">{t("hint")}</span>
       </div>
