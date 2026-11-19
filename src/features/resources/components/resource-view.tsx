@@ -419,7 +419,13 @@ function ResourceList({ contract, viewKey, screens }: ResourceListProps) {
         ) : null}
       </PageHeader>
 
-      <div className="flex shrink-0 flex-col gap-3 border-b px-4 pt-1 sm:px-6">
+      <div
+        className={cn(
+          "flex shrink-0 flex-col gap-3 border-b px-4 pt-2 sm:px-6",
+          // The tab row closes the toolbar when there is one; otherwise the controls need air above the table.
+          view && view.tabs.length > 1 ? null : "pb-3",
+        )}
+      >
         <div className="flex flex-col gap-2 lg:flex-row lg:items-center">
           <SearchField
             key={`${tab?.key}-${activeSaved?.id ?? ""}`}
