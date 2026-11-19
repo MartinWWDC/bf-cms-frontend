@@ -19,7 +19,7 @@ import { useErrorMessage } from "@/lib/api/use-error-message";
 import { useAuthToken } from "../hooks/use-auth-token";
 import { safeNextPath } from "../lib/permissions";
 import { useLogin, useVerifyTwoFactor } from "../mutations";
-import type { IssuedSession, LoginChallenge } from "../types";
+import { type IssuedSession, isIssuedSession, type LoginChallenge } from "../types";
 import { RecoveryCodes } from "./recovery-codes";
 
 type Step =
@@ -124,10 +124,22 @@ function PasswordStep({
 
   const submit = (event: FormEvent) => {
     event.preventDefault();
-    login.mutate({ email: email.trim(), password }, { onSuccess: onChallenge });
+    login.mutate(
+      { email: email.trim(), password },
+      {
+        // A session instead of a challenge means the admin is already signed in.
+        onSuccess: (result) => {
+          if (!isIssuedSession(result)) onChallenge(result);
+        },
+      },
+    );
   };
 
-  const error = login.isError ? errorMessage(login.error) : notice;
+  const fieldError =
+    login.isError && isApiError(login.error)
+      ? (login.error.fields.email?.[0] ?? login.error.fields.password?.[0])
+      : undefined;
+  const error = login.isError ? (fieldError ?? errorMessage(login.error)) : notice;
 
   return (
     <form onSubmit={submit} className="flex flex-col gap-4" noValidate>
@@ -242,7 +254,12 @@ function CodeStep({
         </div>
       ) : null}
 
-      <FormError id={errorId}>{verify.isError ? errorMessage(verify.error) : null}</FormError>
+      <FormError id={errorId}>
+        {verify.isError
+          ? // A message about the code itself says more than the general validation text.
+            ((isApiError(verify.error) && verify.error.fields.code?.[0]) || errorMessage(verify.error))
+          : null}
+      </FormError>
 
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="login-code">{t("code")}</Label>

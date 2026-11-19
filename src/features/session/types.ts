@@ -24,7 +24,7 @@ export interface LoginInput {
   password: string;
 }
 
-/** Answer of the password step. No token is issued yet. */
+/** Answer of the password step where two-factor is required. No token is issued yet. */
 export interface LoginChallenge {
   /** `two_factor`, or `two_factor_setup` on the first login. */
   challenge: string;
@@ -59,4 +59,15 @@ export interface Session {
   created_at: string | null;
   last_used_at: string | null;
   expires_at: string;
+}
+
+/**
+ * What `POST auth/login` answers: a challenge, or the session itself where two-factor is
+ * switched off for the environment (`CMS_TWO_FACTOR_REQUIRED=false`, dev only). Check for
+ * `token` before looking for `challenge`.
+ */
+export type LoginResult = LoginChallenge | IssuedSession;
+
+export function isIssuedSession(result: LoginResult): result is IssuedSession {
+  return typeof (result as IssuedSession).token === "string";
 }

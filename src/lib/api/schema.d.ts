@@ -216,7 +216,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Step 1: email and password */
+        /** Step 1: email and password. Answers the two-factor challenge, or directly the session where two-factor is switched off (dev) */
         post: operations["cms.auth.login"];
         delete?: never;
         options?: never;
@@ -532,6 +532,41 @@ export interface paths {
         head?: never;
         /** Change the admin's language */
         patch: operations["cms.me.update"];
+        trace?: never;
+    };
+    "/me/mcp-tokens": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The admin's MCP tokens (never the secret); needs mcp.use */
+        get: operations["cms.me.mcp-tokens.index"];
+        put?: never;
+        /** Create an MCP token for an MCP client such as Claude; the token is in the answer once and never again */
+        post: operations["cms.me.mcp-tokens.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/mcp-tokens/{token}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Revoke one of the admin's MCP tokens */
+        delete: operations["cms.me.mcp-tokens.destroy"];
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/metrics": {
@@ -1980,7 +2015,7 @@ export interface components {
         AuditEntry: {
             id: number;
             /** @enum {unknown} */
-            event: "record.created" | "record.updated" | "record.deleted" | "record.restored" | "action.run" | "action.queued" | "sensitive.revealed" | "export.requested" | "export.downloaded" | "note.added" | "note.updated" | "note.deleted" | "note.pinned" | "note.unpinned" | "assignment.assigned" | "assignment.unassigned" | "assignment.bulk_queued" | "task.taken" | "task.assigned" | "task.status_changed" | "task.dismissed" | "account.task_queue_changed" | "assistant.conversation_started" | "assistant.message_sent" | "assistant.tool_called" | "assistant.conversation_deleted" | "auth.login" | "auth.logout" | "auth.session_revoked" | "auth.two_factor_enrolled" | "auth.two_factor_reset" | "auth.recovery_codes_regenerated" | "account.language_changed" | "account.view_saved" | "account.view_deleted" | "account.dashboard_saved" | "account.dashboard_deleted" | "access.role_created" | "access.role_updated" | "access.role_deleted" | "access.roles_assigned" | "access.overrides_changed";
+            event: "record.created" | "record.updated" | "record.deleted" | "record.restored" | "action.run" | "action.queued" | "sensitive.revealed" | "export.requested" | "export.downloaded" | "note.added" | "note.updated" | "note.deleted" | "note.pinned" | "note.unpinned" | "assignment.assigned" | "assignment.unassigned" | "assignment.bulk_queued" | "task.taken" | "task.assigned" | "task.status_changed" | "task.dismissed" | "account.task_queue_changed" | "assistant.conversation_started" | "assistant.message_sent" | "assistant.tool_called" | "assistant.conversation_deleted" | "mcp.token_created" | "mcp.token_revoked" | "mcp.tool_called" | "auth.login" | "auth.logout" | "auth.session_revoked" | "auth.two_factor_enrolled" | "auth.two_factor_reset" | "auth.recovery_codes_regenerated" | "account.language_changed" | "account.view_saved" | "account.view_deleted" | "account.dashboard_saved" | "account.dashboard_deleted" | "access.role_created" | "access.role_updated" | "access.role_deleted" | "access.roles_assigned" | "access.overrides_changed";
             event_label: string;
             admin: {
                 id: number;
@@ -2040,6 +2075,32 @@ export interface components {
             last_used_at: string | null;
             /** Format: date-time */
             expires_at: string;
+        };
+        McpToken: {
+            id: number;
+            name: string;
+            active: boolean;
+            /** Format: date-time */
+            created_at: string | null;
+            /** Format: date-time */
+            last_used_at: string | null;
+            last_used_ip: string | null;
+            /** Format: date-time */
+            expires_at: string;
+        };
+        NewMcpToken: {
+            id: number;
+            name: string;
+            active: boolean;
+            /** Format: date-time */
+            created_at: string | null;
+            /** Format: date-time */
+            last_used_at: string | null;
+            last_used_ip: string | null;
+            /** Format: date-time */
+            expires_at: string;
+            token: string;
+            url: string;
         };
         Role: {
             id: number;
@@ -6600,7 +6661,7 @@ export interface operations {
         parameters: {
             query?: {
                 admin_id?: number;
-                event?: "record.created" | "record.updated" | "record.deleted" | "record.restored" | "action.run" | "action.queued" | "sensitive.revealed" | "export.requested" | "export.downloaded" | "note.added" | "note.updated" | "note.deleted" | "note.pinned" | "note.unpinned" | "assignment.assigned" | "assignment.unassigned" | "assignment.bulk_queued" | "task.taken" | "task.assigned" | "task.status_changed" | "task.dismissed" | "account.task_queue_changed" | "assistant.conversation_started" | "assistant.message_sent" | "assistant.tool_called" | "assistant.conversation_deleted" | "auth.login" | "auth.logout" | "auth.session_revoked" | "auth.two_factor_enrolled" | "auth.two_factor_reset" | "auth.recovery_codes_regenerated" | "account.language_changed" | "account.view_saved" | "account.view_deleted" | "account.dashboard_saved" | "account.dashboard_deleted" | "access.role_created" | "access.role_updated" | "access.role_deleted" | "access.roles_assigned" | "access.overrides_changed";
+                event?: "record.created" | "record.updated" | "record.deleted" | "record.restored" | "action.run" | "action.queued" | "sensitive.revealed" | "export.requested" | "export.downloaded" | "note.added" | "note.updated" | "note.deleted" | "note.pinned" | "note.unpinned" | "assignment.assigned" | "assignment.unassigned" | "assignment.bulk_queued" | "task.taken" | "task.assigned" | "task.status_changed" | "task.dismissed" | "account.task_queue_changed" | "assistant.conversation_started" | "assistant.message_sent" | "assistant.tool_called" | "assistant.conversation_deleted" | "mcp.token_created" | "mcp.token_revoked" | "mcp.tool_called" | "auth.login" | "auth.logout" | "auth.session_revoked" | "auth.two_factor_enrolled" | "auth.two_factor_reset" | "auth.recovery_codes_regenerated" | "account.language_changed" | "account.view_saved" | "account.view_deleted" | "account.dashboard_saved" | "account.dashboard_deleted" | "access.role_created" | "access.role_updated" | "access.role_deleted" | "access.roles_assigned" | "access.overrides_changed";
                 resource?: string;
                 record_id?: string;
                 request_id?: string;
@@ -6679,7 +6740,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        data: components["schemas"]["LoginChallenge"];
+                        data: components["schemas"]["LoginChallenge"] | components["schemas"]["IssuedSession"];
                     };
                 };
             };
@@ -7742,6 +7803,149 @@ export interface operations {
             };
             /** @description Validation failed */
             422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "cms.me.mcp-tokens.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["McpToken"][];
+                    };
+                };
+            };
+            /** @description No valid session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The admin lacks the permission */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "cms.me.mcp-tokens.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    name: string;
+                    expires_in_days?: number;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["NewMcpToken"];
+                    };
+                };
+            };
+            /** @description No valid session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The admin lacks the permission */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "cms.me.mcp-tokens.destroy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Done, nothing to return */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No valid session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The admin lacks the permission */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Unknown resource or record */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };

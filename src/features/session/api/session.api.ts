@@ -1,10 +1,13 @@
 import { api, type Envelope, getData } from "@/lib/api/client";
 
-import type { IssuedSession, LoginChallenge, LoginInput, Me, Session, TwoFactorInput } from "../types";
+import type { IssuedSession, LoginInput, LoginResult, Me, Session, TwoFactorInput } from "../types";
 
-/** Step 1: email and password. Answers with a challenge, never with a token. */
-export async function login(input: LoginInput): Promise<LoginChallenge> {
-  const response = await api.post<Envelope<LoginChallenge>>("/auth/login", input);
+/**
+ * Step 1: email and password. Answers with a two-factor challenge, or with the session
+ * itself on an environment where two-factor is switched off.
+ */
+export async function login(input: LoginInput): Promise<LoginResult> {
+  const response = await api.post<Envelope<LoginResult>>("/auth/login", input);
   return response.data.data;
 }
 
