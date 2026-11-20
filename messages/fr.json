@@ -215,6 +215,12 @@
       "addRow": "Ajouter une ligne",
       "removeRow": "Supprimer la ligne"
     },
+    "inline": {
+      "edit": "Modifier {label}",
+      "change": "Changer {label}",
+      "saving": "Enregistrement…",
+      "conflict": "Quelqu’un d’autre a modifié cet enregistrement, rien n’a donc été enregistré. Il a été rechargé : vérifiez la valeur et réessayez."
+    },
     "pickers": {
       "me": "Moi",
       "staffPlaceholder": "Choisir un membre de l'équipe",

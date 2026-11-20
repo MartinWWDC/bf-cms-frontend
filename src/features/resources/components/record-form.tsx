@@ -14,9 +14,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { localeNames } from "@/i18n/config";
 import { isApiError } from "@/lib/api/client";
 import { useErrorMessage, useErrorToast } from "@/lib/api/use-error-message";
-import { isMasked, isMoney, isReference, type Translated } from "@/lib/api/types";
+import type { Translated } from "@/lib/api/types";
 
 import { getField, getValue } from "../lib/contract";
+import { isSameValue, toInputValue } from "../lib/input-values";
 import { useCreateRecord, useSuggestTranslations, useUpdateRecord } from "../mutations";
 import type { Contract, Field, RecordDetail, RecordInput } from "../types";
 import { FieldInput } from "@/components/resource/field-input";
@@ -32,25 +33,10 @@ interface RecordFormProps {
 
 const NOT_WRITABLE: ReadonlySet<Field["type"]> = new Set(["id", "relation_many", "file", "image", "images"]);
 
-/** A record value turned into what the API takes back on save. */
-function toInputValue(field: Field, value: unknown): unknown {
-  if (value === undefined || isMasked(value)) return field.type === "password" ? "" : null;
-  if (field.translated) return { ...((value ?? {}) as Translated) };
-  if (field.type === "money") return isMoney(value) ? value.amount : null;
-  if (field.type === "relation_one" || field.type === "admin") {
-    return isReference(value) ? value.id : ((value as { id?: unknown } | null)?.id ?? null);
-  }
-  return value ?? null;
-}
-
 function referenceLabel(value: unknown): string | null {
   if (typeof value !== "object" || value === null) return null;
   const entry = value as { title?: unknown; name?: unknown };
   return typeof entry.title === "string" ? entry.title : typeof entry.name === "string" ? entry.name : null;
-}
-
-function isSame(a: unknown, b: unknown) {
-  return JSON.stringify(a ?? null) === JSON.stringify(b ?? null);
 }
 
 /**
@@ -106,7 +92,7 @@ export function RecordForm({ contract, record, onSaved, onCancel }: RecordFormPr
   const error = mutation.error;
   const fieldErrors = isApiError(error) && error.code === "validation_failed" ? error.fields : {};
   const isLocked = (field: Field) => !isCreate && field.config.create_only === true;
-  const changed = fields.filter((field) => !isLocked(field) && !isSame(values[field.name], initial[field.name]));
+  const changed = fields.filter((field) => !isLocked(field) && !isSameValue(values[field.name], initial[field.name]));
   const needsReason = contract.writes_require_reason;
   const canSave = (isCreate || changed.length > 0) && (!needsReason || reason.trim() !== "") && !mutation.isPending;
 
@@ -158,7 +144,7 @@ export function RecordForm({ contract, record, onSaved, onCancel }: RecordFormPr
     if (!stale) return;
     const next: Record<string, unknown> = {};
     for (const field of fields) {
-      const edited = !isSame(values[field.name], initial[field.name]);
+      const edited = !isSameValue(values[field.name], initial[field.name]);
       next[field.name] = edited ? values[field.name] : toInputValue(field, getValue(stale.data, field.name));
     }
     setBase(stale);
@@ -168,7 +154,7 @@ export function RecordForm({ contract, record, onSaved, onCancel }: RecordFormPr
   };
 
   const staleFields = stale
-    ? fields.filter((field) => !isSame(toInputValue(field, getValue(stale.data, field.name)), initial[field.name]))
+    ? fields.filter((field) => !isSameValue(toInputValue(field, getValue(stale.data, field.name)), initial[field.name]))
     : [];
 
   return (

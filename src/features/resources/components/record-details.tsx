@@ -12,7 +12,8 @@ import { isMasked, type RecordId, type Translated } from "@/lib/api/types";
 
 import { getField, getValue } from "../lib/contract";
 import { useRevealField } from "../mutations";
-import type { Contract, Field, RecordDetail } from "../types";
+import type { Contract, Field, InlineField, RecordDetail } from "../types";
+import { InlineFieldControl, type InlineFieldProps } from "./inline-field";
 import { FieldValue } from "@/components/resource/field-value";
 
 /** A revealed value is shown only while the admin is looking at it, then masked again. */
@@ -23,11 +24,14 @@ const WIDE: ReadonlySet<Field["type"]> = new Set(["long_text", "rich_text", "cod
 interface RecordDetailsProps {
   contract: Contract;
   record: RecordDetail;
+  /** Fields that can be changed in place, from the tab the record was opened from. */
+  inline?: InlineField[];
   onOpenRecord: (resource: string, id: RecordId) => void;
+  onRunAction: InlineFieldProps["onRunAction"];
 }
 
 /** The contract's detail sections, each field rendered by its type. */
-export function RecordDetails({ contract, record, onOpenRecord }: RecordDetailsProps) {
+export function RecordDetails({ contract, record, inline, onOpenRecord, onRunAction }: RecordDetailsProps) {
   return (
     <div className="flex flex-col gap-7 px-5 py-6 sm:px-7">
       {contract.detail.sections.map((section) => {
@@ -50,7 +54,9 @@ export function RecordDetails({ contract, record, onOpenRecord }: RecordDetailsP
                   contract={contract}
                   record={record}
                   field={field}
+                  inline={inline?.find((entry) => entry.field === field.name)}
                   onOpenRecord={onOpenRecord}
+                  onRunAction={onRunAction}
                 />
               ))}
             </dl>
@@ -65,12 +71,16 @@ function DetailField({
   contract,
   record,
   field,
+  inline,
   onOpenRecord,
+  onRunAction,
 }: {
   contract: Contract;
   record: RecordDetail;
   field: Field;
+  inline?: InlineField;
   onOpenRecord: (resource: string, id: RecordId) => void;
+  onRunAction: InlineFieldProps["onRunAction"];
 }) {
   const t = useTranslations("resources.drawer");
   const value = getValue(record.data, field.name);
@@ -98,6 +108,18 @@ function DetailField({
           <SensitiveValue contract={contract} record={record} field={field} />
         ) : isTranslatedText && field.type !== "json" ? (
           <TranslatedValue field={field} value={value as Translated} />
+        ) : inline ? (
+          <InlineFieldControl
+            contract={contract}
+            entry={inline}
+            field={field}
+            recordId={record.data.id}
+            value={value}
+            record={record}
+            variant="detail"
+            onOpenRecord={onOpenRecord}
+            onRunAction={onRunAction}
+          />
         ) : (
           <FieldValue field={field} value={value} variant="detail" onOpenRecord={onOpenRecord} />
         )}

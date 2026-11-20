@@ -215,6 +215,12 @@
       "addRow": "Añadir fila",
       "removeRow": "Quitar fila"
     },
+    "inline": {
+      "edit": "Editar {label}",
+      "change": "Cambiar {label}",
+      "saving": "Guardando…",
+      "conflict": "Otra persona ha cambiado este registro, por lo que no se ha guardado nada. Se ha vuelto a cargar: revisa el valor e inténtalo de nuevo."
+    },
     "pickers": {
       "me": "Yo",
       "staffPlaceholder": "Elegir a alguien del equipo",

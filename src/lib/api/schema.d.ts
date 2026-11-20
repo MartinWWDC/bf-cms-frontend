@@ -1075,7 +1075,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** The aggregated screen of one record (detail.custom_endpoint in the contract): everything a custom-built screen shows in one call; the record itself in meta.record. The data shape per screen is described in cms/docs */
+        /** The aggregated screen of one record (detail.custom_endpoint in the contract): everything a custom-built screen shows in one call; the record itself in meta.record. Pass view to get the screen of the view the record was opened from (views[].screen in the contract); without it the resource screen (detail.screen). meta.layout lists the parts in the order the screen shows them. The data shape per screen is described in cms/docs */
         get: operations["cms.resources.records.screen"];
         put?: never;
         post?: never;
@@ -1643,6 +1643,7 @@ export interface components {
             aggregates: ("count" | "sum" | "avg" | "min" | "max")[];
             sensitive: boolean;
             translated: boolean;
+            filled_from?: string | null;
             via?: string | null;
             config: {
                 [key: string]: unknown;
@@ -1670,6 +1671,7 @@ export interface components {
             views: {
                 key: string;
                 label: string;
+                screen: string | null;
                 tabs: {
                     key: string;
                     label: string;
@@ -1677,6 +1679,7 @@ export interface components {
                     default_sort: string;
                     count: boolean;
                     actions: string[];
+                    inline: components["schemas"]["InlineField"][];
                 }[];
             }[];
             actions: components["schemas"]["Action"][];
@@ -1689,8 +1692,18 @@ export interface components {
                 related: string[];
                 panels: string[];
                 custom_endpoint: string | null;
+                screen: string | null;
             };
             collaboration: components["schemas"]["Collaboration"];
+        };
+        InlineField: {
+            field: string;
+            /** @enum {unknown} */
+            mode: "field" | "action" | "result";
+            editable: boolean;
+            action: string | null;
+            input: string | null;
+            filled_from: string | null;
         };
         Action: {
             key: string;
@@ -10330,7 +10343,9 @@ export interface operations {
     };
     "cms.resources.records.screen": {
         parameters: {
-            query?: never;
+            query?: {
+                view?: string;
+            };
             header?: never;
             path: {
                 resource: string;
@@ -10351,6 +10366,9 @@ export interface operations {
                             [key: string]: unknown;
                         };
                         meta: {
+                            screen: string;
+                            view: string | null;
+                            layout: string[];
                             record: components["schemas"]["RecordDetail"];
                         };
                     };

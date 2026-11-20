@@ -27,7 +27,7 @@ import { isMoney, type RecordId } from "@/lib/api/types";
 import { getAction, getRecordTitle, getValue } from "../lib/contract";
 import { useDeleteRecord, useRestoreRecord } from "../mutations";
 import { useResourceContract, useResourceRecord } from "../queries";
-import type { Action, Contract, RecordDetail, RecordScreenProps, ScreenRegistry } from "../types";
+import type { Action, Contract, InlineField, RecordDetail, RecordScreenProps, ScreenRegistry } from "../types";
 import { ActionDialog, type ActionRun } from "@/components/resource/action-dialog";
 import { AssigneeControl } from "./assignee-control";
 import { HistoryPanel } from "./history-panel";
@@ -42,12 +42,14 @@ export const NEW_RECORD = "new";
 
 interface RecordDrawerProps {
   /** The record to show; `null` closes the drawer. `id: "new"` shows the create form. */
-  open: { resource: string; id: string } | null;
+  open: { resource: string; id: string; view?: string | null } | null;
   onClose: () => void;
   /** Opens another record in the drawer (a linked record, a related row). */
   onOpenRecord: (resource: string, id: RecordId) => void;
   /** Keys of the actions that belong to the tab the admin came from; offered first. */
   tabActions?: string[];
+  /** Inline fields of the tab the admin came from; editable in place on the Details tab. */
+  inline?: InlineField[];
   screens?: ScreenRegistry;
 }
 
@@ -56,10 +58,12 @@ interface RecordDrawerProps {
  * lists, notes, history, editing and the record's actions. Rendered entirely from the
  * resource contract and the record's `meta`.
  */
-export function RecordDrawer({ open, onClose, onOpenRecord, tabActions, screens }: RecordDrawerProps) {
+export function RecordDrawer({ open, onClose, onOpenRecord, tabActions, inline, screens }: RecordDrawerProps) {
   // Keep showing the last record while the drawer animates closed.
   const [last, setLast] = useState(open);
-  if (open !== null && (open.resource !== last?.resource || open.id !== last?.id)) setLast(open);
+  if (open !== null && (open.resource !== last?.resource || open.id !== last?.id || open.view !== last?.view)) {
+    setLast(open);
+  }
   const shown = open ?? last;
 
   return (
@@ -73,9 +77,11 @@ export function RecordDrawer({ open, onClose, onOpenRecord, tabActions, screens 
             key={`${shown.resource}:${shown.id}`}
             resource={shown.resource}
             id={shown.id}
+            view={shown.view ?? null}
             onClose={onClose}
             onOpenRecord={onOpenRecord}
             tabActions={tabActions}
+            inline={inline}
             screens={screens}
           />
         ) : null}
@@ -87,13 +93,16 @@ export function RecordDrawer({ open, onClose, onOpenRecord, tabActions, screens 
 interface DrawerBodyProps {
   resource: string;
   id: string;
+  /** Key of the list view the record was opened from; `null` for a direct link. */
+  view: string | null;
   onClose: () => void;
   onOpenRecord: (resource: string, id: RecordId) => void;
   tabActions?: string[];
+  inline?: InlineField[];
   screens?: ScreenRegistry;
 }
 
-function DrawerBody({ resource, id, onClose, onOpenRecord, tabActions, screens }: DrawerBodyProps) {
+function DrawerBody({ resource, id, view, onClose, onOpenRecord, tabActions, inline, screens }: DrawerBodyProps) {
   const t = useTranslations("resources.drawer");
   const isNew = id === NEW_RECORD;
   const contract = useResourceContract(resource);
@@ -141,9 +150,12 @@ function DrawerBody({ resource, id, onClose, onOpenRecord, tabActions, screens }
     <RecordContent
       contract={contract.data}
       record={record.data as RecordDetail}
+      // A view the contract no longer has (an old link) would answer 404: open the default screen instead.
+      view={contract.data.views.some((entry) => entry.key === view) ? view : null}
       onClose={onClose}
       onOpenRecord={onOpenRecord}
       tabActions={tabActions}
+      inline={inline}
       Screen={contract.data.detail.custom_endpoint ? screens?.[resource] : undefined}
     />
   );
@@ -152,13 +164,15 @@ function DrawerBody({ resource, id, onClose, onOpenRecord, tabActions, screens }
 interface RecordContentProps {
   contract: Contract;
   record: RecordDetail;
+  view: string | null;
   onClose: () => void;
   onOpenRecord: (resource: string, id: RecordId) => void;
   tabActions?: string[];
+  inline?: InlineField[];
   Screen?: ComponentType<RecordScreenProps>;
 }
 
-function RecordContent({ contract, record, onClose, onOpenRecord, tabActions, Screen }: RecordContentProps) {
+function RecordContent({ contract, record, view, onClose, onOpenRecord, tabActions, inline, Screen }: RecordContentProps) {
   const t = useTranslations("resources.drawer");
   const { meta, data } = record;
   const [tab, setTab] = useState(Screen ? "overview" : "details");
@@ -299,6 +313,7 @@ function RecordContent({ contract, record, onClose, onOpenRecord, tabActions, Sc
               <Screen
                 contract={contract}
                 record={record}
+                view={view}
                 onOpenRecord={onOpenRecord}
                 onShowRecord={(next) => onOpenRecord(contract.key, next)}
                 onRunAction={(key, initialInput) => {
@@ -318,7 +333,13 @@ function RecordContent({ contract, record, onClose, onOpenRecord, tabActions, Sc
                 onSaved={() => setEditing(false)}
               />
             ) : (
-              <RecordDetails contract={contract} record={record} onOpenRecord={onOpenRecord} />
+              <RecordDetails
+                contract={contract}
+                record={record}
+                inline={inline}
+                onOpenRecord={onOpenRecord}
+                onRunAction={(action, _id, initialInput) => runAction(action, initialInput)}
+              />
             )}
           </TabsContent>
 

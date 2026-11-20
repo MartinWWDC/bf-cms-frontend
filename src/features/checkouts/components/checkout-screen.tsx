@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { Fragment, type ReactNode } from "react";
 import Link from "next/link";
 import { CheckIcon, CircleIcon, InfoIcon, OctagonXIcon, TriangleAlertIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -16,7 +16,7 @@ import { useFormat } from "@/i18n/use-format";
 import type { Money, Tone } from "@/lib/api/types";
 import { routes } from "@/lib/routes";
 
-import { hasPart, isZero, SETTLE_MONEY, SINGLE_MONEY_ACTIONS } from "../lib/overview";
+import { hasPart, isZero, layoutBlocks, PART_GROUP, SETTLE_MONEY, SINGLE_MONEY_ACTIONS } from "../lib/overview";
 import type {
   AddressKey,
   CheckoutMoney,
@@ -53,13 +53,17 @@ function isKnown<T extends string>(list: readonly T[], value: string): value is 
  * The checkout overview: the whole checkout in one call
  * (`GET /resources/checkouts/records/{id}/screen`, `cms/docs/checkout-workflow.md`).
  *
+ * Each list view can open its own screen (`?view=`): the same parts in another order, money
+ * first from Payments, shipments first from Operations. The parts are shown in the order
+ * of `meta.layout`.
+ *
  * Parts the admin may not view are named in `hidden_parts` and simply not shown. Money
  * moves only through the record's actions, which open the shared action dialog (preview,
  * risk flags, reason, confirmation, idempotency key).
  */
-export function CheckoutScreen({ contract, record, onOpenRecord, onRunAction }: RecordScreenProps) {
+export function CheckoutScreen({ contract, record, view, onOpenRecord, onRunAction }: RecordScreenProps) {
   const t = useTranslations("checkouts");
-  const screen = useRecordScreen<CheckoutOverview>(contract.key, record.data.id);
+  const screen = useRecordScreen<CheckoutOverview>(contract.key, record.data.id, view);
 
   if (screen.isError) {
     return <ErrorState title={t("loadFailed")} error={screen.error} onRetry={() => screen.refetch()} />;
@@ -88,109 +92,145 @@ export function CheckoutScreen({ contract, record, onOpenRecord, onRunAction }: 
       </Section>
     ) : null;
 
+  /** One part as a card of a shared section (people, listing); `null` when it is hidden or empty. */
+  const card = (part: string): ReactNode => {
+    switch (part) {
+      case "buyer":
+        return hasPart(data, "buyer") ? (
+          <Person key={part} title={t("buyer")} person={data.buyer} contract={contract} onOpenRecord={onOpenRecord} />
+        ) : null;
+      case "seller":
+        return hasPart(data, "seller") ? (
+          <Person key={part} title={t("seller")} person={data.seller} contract={contract} onOpenRecord={onOpenRecord} />
+        ) : null;
+      case "ad":
+        return hasPart(data, "ad") && data.ad ? (
+          <PartCard key={part} title={t("ad")} record={data.ad} onOpenRecord={onOpenRecord} />
+        ) : null;
+      case "offer":
+        return hasPart(data, "offer") && data.offer ? (
+          <PartCard key={part} title={t("offer")} record={data.offer} onOpenRecord={onOpenRecord} />
+        ) : null;
+      default:
+        return null;
+    }
+  };
+
+  /** One block of the screen: a part on its own, or neighbouring parts that share a section. */
+  const block = (parts: string[]): ReactNode => {
+    const part = parts[0];
+    switch (part) {
+      case "progress":
+        return <Progress steps={data.progress} />;
+      case "money":
+        return <MoneyPanel money={data.money} actions={actions} contractActions={contract.actions} onRunAction={onRunAction} />;
+      case "payout_blocks":
+        return data.payout_blocks.length > 0 ? (
+          <Section title={t("payoutBlocks.title")} count={data.payout_blocks.length}>
+            <PayoutBlocks blocks={data.payout_blocks} />
+          </Section>
+        ) : null;
+      case "checkout":
+        return (
+          <Section title={t("sections.checkout")}>
+            <FieldRows contract={contract} values={data.checkout} onOpenRecord={onOpenRecord} />
+          </Section>
+        );
+      case "pricing":
+        return (
+          <Section title={t("sections.pricing")}>
+            <FieldRows contract={contract} values={data.pricing} onOpenRecord={onOpenRecord} />
+          </Section>
+        );
+      case "buyer":
+      case "seller":
+      case "ad":
+      case "offer": {
+        const cards = parts.map(card).filter((entry) => entry !== null);
+        return cards.length > 0 ? (
+          <Section title={t(PART_GROUP[part] === "people" ? "sections.people" : "sections.listing")}>
+            <div className="grid gap-3 lg:grid-cols-2">{cards}</div>
+          </Section>
+        ) : null;
+      }
+      case "addresses":
+        return hasPart(data, "addresses") && ADDRESS_KEYS.some((key) => data.addresses[key]) ? (
+          <Section title={t("sections.addresses")}>
+            <div className="grid gap-3 lg:grid-cols-2">
+              {ADDRESS_KEYS.map((key) => {
+                const address = data.addresses[key];
+                return address ? (
+                  <PartCard key={key} title={t(`addresses.${key}`)} record={address} onOpenRecord={onOpenRecord} />
+                ) : null;
+              })}
+            </div>
+          </Section>
+        ) : null;
+      case "shipments":
+        return hasPart(data, "shipments") ? list(data.shipments, t("sections.shipments")) : null;
+      case "complaints":
+        return hasPart(data, "complaints") ? list(data.complaints, t("sections.complaints")) : null;
+      case "cancellation":
+        return hasPart(data, "cancellation") && data.cancellation
+          ? list([data.cancellation], t("sections.cancellation"))
+          : null;
+      case "insurance":
+        return hasPart(data, "insurance") && data.insurance ? list([data.insurance], t("sections.insurance")) : null;
+      case "invoices":
+        return hasPart(data, "invoices") ? list(data.invoices, t("sections.invoices")) : null;
+      case "packaging_proof":
+        return (
+          <Section title={t("packagingProof.title")}>
+            <PackagingProof proof={data.packaging_proof} />
+          </Section>
+        );
+      case "counts":
+        return (
+          <Section title={t("sections.activity")}>
+            <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {COUNT_KEYS.map((key) => {
+                const entry = data.counts[key];
+                // Both are null when the admin may not see that feed.
+                if (!entry || entry.count === null) return null;
+                const body = (
+                  <>
+                    <dt className="font-mono text-[0.6875rem] tracking-wider text-muted-foreground uppercase">
+                      {t(`counts.${key}`)}
+                    </dt>
+                    <dd className="font-heading text-2xl leading-none font-semibold tabular-nums">{entry.count}</dd>
+                  </>
+                );
+                const className = "flex flex-col gap-1.5 rounded-lg border bg-card px-3 py-2.5";
+                return key === "open_tasks" ? (
+                  <Link
+                    key={key}
+                    href={`${routes.tasks}?resource=${contract.key}&record_id=${encodeURIComponent(String(record.data.id))}`}
+                    className={cn(className, "outline-none hover:bg-accent/60 focus-visible:ring-2 focus-visible:ring-ring")}
+                  >
+                    {body}
+                  </Link>
+                ) : (
+                  <div key={key} className={className}>
+                    {body}
+                  </div>
+                );
+              })}
+            </dl>
+            <p className="mt-2 text-xs text-muted-foreground">{t("counts.hint")}</p>
+          </Section>
+        );
+      default:
+        // A part this version does not know is skipped.
+        return null;
+    }
+  };
+
   return (
     <div className="flex flex-col gap-7 px-5 py-6 sm:px-7">
-      <Progress steps={data.progress} />
-
-      <MoneyPanel money={data.money} actions={actions} contractActions={contract.actions} onRunAction={onRunAction} />
-
-      {data.payout_blocks.length > 0 ? (
-        <Section title={t("payoutBlocks.title")} count={data.payout_blocks.length}>
-          <PayoutBlocks blocks={data.payout_blocks} />
-        </Section>
-      ) : null}
-
-      <Section title={t("sections.checkout")}>
-        <FieldRows contract={contract} values={data.checkout} onOpenRecord={onOpenRecord} />
-      </Section>
-
-      <Section title={t("sections.pricing")}>
-        <FieldRows contract={contract} values={data.pricing} onOpenRecord={onOpenRecord} />
-      </Section>
-
-      {hasPart(data, "buyer") || hasPart(data, "seller") ? (
-        <Section title={t("sections.people")}>
-          <div className="grid gap-3 lg:grid-cols-2">
-            {hasPart(data, "buyer") ? (
-              <Person title={t("buyer")} person={data.buyer} contract={contract} onOpenRecord={onOpenRecord} />
-            ) : null}
-            {hasPart(data, "seller") ? (
-              <Person title={t("seller")} person={data.seller} contract={contract} onOpenRecord={onOpenRecord} />
-            ) : null}
-          </div>
-        </Section>
-      ) : null}
-
-      {(hasPart(data, "ad") && data.ad) || (hasPart(data, "offer") && data.offer) ? (
-        <Section title={t("sections.listing")}>
-          <div className="grid gap-3 lg:grid-cols-2">
-            {hasPart(data, "ad") && data.ad ? (
-              <PartCard title={t("ad")} record={data.ad} onOpenRecord={onOpenRecord} />
-            ) : null}
-            {hasPart(data, "offer") && data.offer ? (
-              <PartCard title={t("offer")} record={data.offer} onOpenRecord={onOpenRecord} />
-            ) : null}
-          </div>
-        </Section>
-      ) : null}
-
-      {hasPart(data, "addresses") && ADDRESS_KEYS.some((key) => data.addresses[key]) ? (
-        <Section title={t("sections.addresses")}>
-          <div className="grid gap-3 lg:grid-cols-2">
-            {ADDRESS_KEYS.map((key) => {
-              const address = data.addresses[key];
-              return address ? (
-                <PartCard key={key} title={t(`addresses.${key}`)} record={address} onOpenRecord={onOpenRecord} />
-              ) : null;
-            })}
-          </div>
-        </Section>
-      ) : null}
-
-      {hasPart(data, "shipments") ? list(data.shipments, t("sections.shipments")) : null}
-      {hasPart(data, "complaints") ? list(data.complaints, t("sections.complaints")) : null}
-      {hasPart(data, "cancellation") && data.cancellation
-        ? list([data.cancellation], t("sections.cancellation"))
-        : null}
-      {hasPart(data, "insurance") && data.insurance ? list([data.insurance], t("sections.insurance")) : null}
-      {hasPart(data, "invoices") ? list(data.invoices, t("sections.invoices")) : null}
-
-      <Section title={t("packagingProof.title")}>
-        <PackagingProof proof={data.packaging_proof} />
-      </Section>
-
-      <Section title={t("sections.activity")}>
-        <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {COUNT_KEYS.map((key) => {
-            const entry = data.counts[key];
-            // Both are null when the admin may not see that feed.
-            if (!entry || entry.count === null) return null;
-            const body = (
-              <>
-                <dt className="font-mono text-[0.6875rem] tracking-wider text-muted-foreground uppercase">
-                  {t(`counts.${key}`)}
-                </dt>
-                <dd className="font-heading text-2xl leading-none font-semibold tabular-nums">{entry.count}</dd>
-              </>
-            );
-            const className = "flex flex-col gap-1.5 rounded-lg border bg-card px-3 py-2.5";
-            return key === "open_tasks" ? (
-              <Link
-                key={key}
-                href={`${routes.tasks}?resource=${contract.key}&record_id=${encodeURIComponent(String(record.data.id))}`}
-                className={cn(className, "outline-none hover:bg-accent/60 focus-visible:ring-2 focus-visible:ring-ring")}
-              >
-                {body}
-              </Link>
-            ) : (
-              <div key={key} className={className}>
-                {body}
-              </div>
-            );
-          })}
-        </dl>
-        <p className="mt-2 text-xs text-muted-foreground">{t("counts.hint")}</p>
-      </Section>
+      {/* An API that does not send the layout yet gets the default order. */}
+      {layoutBlocks(screen.data.meta.layout ?? []).map((parts) => (
+        <Fragment key={parts[0]}>{block(parts)}</Fragment>
+      ))}
     </div>
   );
 }

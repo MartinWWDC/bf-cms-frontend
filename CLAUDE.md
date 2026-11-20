@@ -30,6 +30,8 @@ This app replaces Nova and Airtable. How the backend works, per the plan:
 - **Auth.** Bearer token on every request; no cookies, no CSRF. First login forces two-factor setup.
 - **Languages.** Five interface languages (en, de, it, es, fr), chosen per admin. The backend translates labels and errors from `Accept-Language`; `error.details` stays English. Translated fields arrive with all five languages.
 - **Editing.** Detail drawer, with row versions for stale-save protection. Page-number paging with capped totals on large tables.
+- **Inline fields** (changelog 20 Nov 2026, newer than the plan). A tab lists the few fields that can be changed in place (`inline`: `field`, `action` or `result`); they are edited in the list and on the Details tab through `InlineFieldControl`, everything else through the edit form.
+- **Screen per view** (changelog 20 Nov 2026). A record opened from a list asks for that view's detail screen (`.../screen?view=`); the view stays in the URL as `?from=`, and a direct link opens the resource's default screen.
 - **Sensitive data** is masked by default; revealing needs a permission and is logged.
 - **Money actions** (refund, payout) need a risk warning, a mandatory reason and a confirmation.
 - **Actions** carry an `Idempotency-Key`; a preview returns risk flags (warnings must be acknowledged, blocking ones stop the action); actions on many records and exports are queued jobs.

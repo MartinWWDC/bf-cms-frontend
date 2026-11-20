@@ -14,6 +14,8 @@ export const SELECT_COLUMN_ID = "__select";
 interface ColumnOptions {
   /** Opens a linked record shown in a cell. */
   onOpenRecord?: (resource: string, id: RecordId) => void;
+  /** Replaces the cell of a field that can be edited in place; `null` keeps the plain value. */
+  inlineCell?: (field: Field, record: ResourceRecord, value: unknown) => ReactNode | null;
   /** Leading checkbox column, for actions on many records. */
   selection?: {
     header: () => ReactNode;
@@ -31,9 +33,10 @@ export function buildResourceColumns(fields: Field[], options: ColumnOptions = {
     meta: {
       align: RIGHT_ALIGNED.has(field.type) ? "right" : "left",
     } satisfies DataTableColumnMeta,
-    cell: ({ getValue: cellValue }) => (
-      <FieldValue field={field} value={cellValue()} variant="cell" onOpenRecord={options.onOpenRecord} />
-    ),
+    cell: ({ getValue: cellValue, row }) =>
+      options.inlineCell?.(field, row.original, cellValue()) ?? (
+        <FieldValue field={field} value={cellValue()} variant="cell" onOpenRecord={options.onOpenRecord} />
+      ),
   }));
 
   if (!options.selection) return columns;

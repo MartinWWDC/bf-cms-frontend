@@ -99,9 +99,18 @@ export async function fetchRelatedRecords(
   return response.data;
 }
 
-/** The aggregated screen of a record (`detail.custom_endpoint`). */
-export async function fetchRecordScreen<TData>(resource: string, id: RecordId): Promise<RecordScreen<TData>> {
-  const response = await api.get<RecordScreen<TData>>(`${recordPath(resource, id)}/screen`);
+/**
+ * The aggregated screen of a record (`detail.custom_endpoint`). With `view`, the screen of
+ * the list view the record was opened from; without it the resource's default screen.
+ */
+export async function fetchRecordScreen<TData>(
+  resource: string,
+  id: RecordId,
+  view?: string | null,
+): Promise<RecordScreen<TData>> {
+  const response = await api.get<RecordScreen<TData>>(`${recordPath(resource, id)}/screen`, {
+    params: view ? { view } : undefined,
+  });
   return response.data;
 }
 

@@ -42,10 +42,10 @@ const linkClass =
  *
  * Everything written by users (descriptions, reports, messages) is rendered as text.
  */
-export function ModerationScreen({ contract, record, onOpenRecord, onRunAction, onShowRecord }: RecordScreenProps) {
+export function ModerationScreen({ contract, record, view, onOpenRecord, onRunAction, onShowRecord }: RecordScreenProps) {
   const t = useTranslations("moderation");
   const format = useFormat();
-  const screen = useRecordScreen<ModerationReview>(contract.key, record.data.id);
+  const screen = useRecordScreen<ModerationReview>(contract.key, record.data.id, view);
 
   if (screen.isError) {
     return <ErrorState title={t("loadFailed")} error={screen.error} onRetry={() => screen.refetch()} />;

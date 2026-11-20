@@ -20,6 +20,9 @@ interface SimpleSelectProps {
   id?: string;
   "aria-label"?: string;
   className?: string;
+  /** Opens the list as soon as the select appears (an in-place editor). */
+  defaultOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 /** A select over a plain list of options that shows the option's label, not its value. */
@@ -33,6 +36,8 @@ export function SimpleSelect({
   invalid,
   id,
   className,
+  defaultOpen,
+  onOpenChange,
   ...aria
 }: SimpleSelectProps) {
   return (
@@ -42,6 +47,8 @@ export function SimpleSelect({
         if (typeof next === "string") onChange(next);
       }}
       disabled={disabled}
+      defaultOpen={defaultOpen}
+      onOpenChange={onOpenChange ? (open) => onOpenChange(open) : undefined}
     >
       <SelectTrigger
         id={id}

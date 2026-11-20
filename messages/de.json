@@ -215,6 +215,12 @@
       "addRow": "Zeile hinzufügen",
       "removeRow": "Zeile entfernen"
     },
+    "inline": {
+      "edit": "{label} bearbeiten",
+      "change": "{label} ändern",
+      "saving": "Wird gespeichert…",
+      "conflict": "Jemand anderes hat diesen Datensatz geändert, deshalb wurde nichts gespeichert. Er wurde neu geladen: Prüfe den Wert und versuche es erneut."
+    },
     "pickers": {
       "me": "Ich",
       "staffPlaceholder": "Teammitglied auswählen",

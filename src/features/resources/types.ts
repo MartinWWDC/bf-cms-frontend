@@ -147,6 +147,8 @@ export interface Field {
   translated: boolean;
   /** Name of the relation this linked-record field is read through. */
   via?: string | null;
+  /** The field a save fills this one from (`carrier` from `tracking_link`), if any. */
+  filled_from?: string | null;
   config: FieldConfig;
 }
 
@@ -191,6 +193,22 @@ export interface Relation {
   count: boolean;
 }
 
+/** A field that can be changed straight in the list or on the detail page (`field-types.md` section 5). */
+export interface InlineField {
+  field: string;
+  /**
+   * `field`: saved with a `PATCH` of that one field. `action`: changed by running `action`
+   * with the new value as its input `input`. `result`: filled by the backend when
+   * `filled_from` is saved; read-only.
+   */
+  mode: "field" | "action" | "result";
+  /** Already worked out for the admin. Per record, `meta.abilities.update` or `meta.actions` still apply. */
+  editable: boolean;
+  action: string | null;
+  input: string | null;
+  filled_from: string | null;
+}
+
 export interface ViewTab {
   key: string;
   label: string;
@@ -200,11 +218,15 @@ export interface ViewTab {
   count: boolean;
   /** Keys of the actions that belong to this tab's work, already limited to what the admin may run. */
   actions: string[];
+  /** The few fields of the tab that can be edited in place. Empty when there are none. */
+  inline: InlineField[];
 }
 
 export interface View {
   key: string;
   label: string;
+  /** Key of the detail screen a record opens with from this view; `null` without an aggregated screen. */
+  screen: string | null;
   /** Always at least one. A tab's filter is applied by the backend and never sent. */
   tabs: ViewTab[];
 }
@@ -256,6 +278,8 @@ export interface Contract {
     panels: string[];
     /** Set when the resource has an aggregated screen (`.../records/{id}/screen`). */
     custom_endpoint: string | null;
+    /** Key of the resource's default aggregated screen. A view can open another one (`View.screen`). */
+    screen: string | null;
   };
   collaboration: Collaboration;
 }
@@ -358,7 +382,15 @@ export interface RecordDetail {
 /** Answer of an aggregated screen. `data` is the screen's own shape. */
 export interface RecordScreen<TData = Record<string, unknown>> {
   data: TData;
-  meta: { record: RecordDetail };
+  meta: {
+    /** Key of the screen that answered. */
+    screen: string;
+    /** The view the screen was asked for; `null` for the resource's default screen. */
+    view: string | null;
+    /** The parts of `data` in the order this screen shows them. */
+    layout: string[];
+    record: RecordDetail;
+  };
 }
 
 export interface RevealedValue {
@@ -526,6 +558,8 @@ export type ExportFormat = "csv" | "xlsx";
 export interface RecordScreenProps {
   contract: Contract;
   record: RecordDetail;
+  /** Key of the list view the record was opened from; `null` for a direct link. Passed to the `screen` endpoint. */
+  view: string | null;
   onOpenRecord: (resource: string, id: RecordId) => void;
   /** Opens the normal action dialog for one of the record's actions. */
   onRunAction: (actionKey: string, initialInput?: Record<string, unknown>) => void;

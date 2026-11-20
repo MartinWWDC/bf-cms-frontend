@@ -215,6 +215,12 @@
       "addRow": "Add row",
       "removeRow": "Remove row"
     },
+    "inline": {
+      "edit": "Edit {label}",
+      "change": "Change {label}",
+      "saving": "Saving…",
+      "conflict": "Someone else changed this record, so nothing was saved. It has been reloaded: check the value and try again."
+    },
     "pickers": {
       "me": "Me",
       "staffPlaceholder": "Choose a staff member",

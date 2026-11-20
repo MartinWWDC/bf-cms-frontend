@@ -17,7 +17,8 @@ export const resourceKeys = {
   records: (resource: string) => [...resourceKeys.all(resource), "record"] as const,
   record: (resource: string, id: RecordId) => [...resourceKeys.records(resource), String(id)] as const,
   detail: (resource: string, id: RecordId) => [...resourceKeys.record(resource, id), "detail"] as const,
-  screen: (resource: string, id: RecordId) => [...resourceKeys.record(resource, id), "screen"] as const,
+  screen: (resource: string, id: RecordId, view: string | null) =>
+    [...resourceKeys.record(resource, id), "screen", { view }] as const,
   related: (resource: string, id: RecordId, relation: string, params: ListParams) =>
     [...resourceKeys.record(resource, id), "related", relation, params] as const,
   notes: (resource: string, id: RecordId, linked: boolean) =>

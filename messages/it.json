@@ -215,6 +215,12 @@
       "addRow": "Aggiungi riga",
       "removeRow": "Rimuovi riga"
     },
+    "inline": {
+      "edit": "Modifica {label}",
+      "change": "Cambia {label}",
+      "saving": "Salvataggio…",
+      "conflict": "Qualcun altro ha modificato questo record, quindi non è stato salvato nulla. È stato ricaricato: controlla il valore e riprova."
+    },
     "pickers": {
       "me": "Io",
       "staffPlaceholder": "Scegli un membro dello staff",

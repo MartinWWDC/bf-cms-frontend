@@ -18,6 +18,8 @@ export interface OpenRecord {
   resource: string | null;
   /** Record id, or `new` for the create form. */
   id: string;
+  /** Key of the list view the record was opened from (`?from=`); absent for a direct link. */
+  view?: string | null;
 }
 
 export interface ListState {
@@ -52,12 +54,12 @@ function parseList(raw: string | null): string[] {
   return raw ? raw.split(",").filter(Boolean) : [];
 }
 
-function parseRecord(raw: string | null): OpenRecord | null {
+function parseRecord(raw: string | null, view: string | null): OpenRecord | null {
   if (!raw) return null;
   const separator = raw.indexOf(":");
   return separator === -1
-    ? { resource: null, id: raw }
-    : { resource: raw.slice(0, separator), id: raw.slice(separator + 1) };
+    ? { resource: null, id: raw, view }
+    : { resource: raw.slice(0, separator), id: raw.slice(separator + 1), view: null };
 }
 
 function serializeRecord(record: OpenRecord | null): string | null {
@@ -66,7 +68,8 @@ function serializeRecord(record: OpenRecord | null): string | null {
 }
 
 /**
- * List state (tab, page, sort, search, filter, grouping, saved view, columns, open record)
+ * List state (tab, page, sort, search, filter, grouping, saved view, columns, open record
+ * and the view it was opened from)
  * kept in the URL, so a view can be shared or reloaded as-is. Defaults are left out of the
  * URL to keep it short.
  *
@@ -94,7 +97,7 @@ export function useListState() {
       trashed: trashed === "with" || trashed === "only" ? trashed : null,
       savedView: saved === null ? null : Number.isInteger(Number(saved)) ? Number(saved) : null,
       columns: columns.length > 0 ? columns : null,
-      record: parseRecord(searchParams.get("record")),
+      record: parseRecord(searchParams.get("record"), searchParams.get("from")),
     };
   }, [searchParams]);
 
@@ -118,7 +121,11 @@ export function useListState() {
     if (patch.trashed !== undefined) set("trashed", patch.trashed);
     if (patch.savedView !== undefined) set("saved", patch.savedView === null ? null : String(patch.savedView));
     if (patch.columns !== undefined) set("cols", patch.columns?.length ? patch.columns.join(",") : null);
-    if (patch.record !== undefined) set("record", serializeRecord(patch.record));
+    if (patch.record !== undefined) {
+      set("record", serializeRecord(patch.record));
+      // The view travels with the record, so reload, Back and shared links open the same detail screen.
+      set("from", patch.record && !patch.record.resource ? (patch.record.view ?? null) : null);
+    }
 
     const query = params.toString();
     const url = query ? `${window.location.pathname}?${query}` : window.location.pathname;

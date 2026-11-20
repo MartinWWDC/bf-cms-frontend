@@ -13,6 +13,7 @@ export { usePreviewAction } from "./use-preview-action";
 export { useRestoreRecord } from "./use-restore-record";
 export { useRevealField } from "./use-reveal-field";
 export { type ActionTarget, type RunActionOutcome, useRunAction } from "./use-run-action";
+export { useSaveInlineField } from "./use-save-inline-field";
 export { useSaveView } from "./use-save-view";
 export { useSuggestTranslations } from "./use-suggest-translations";
 export { useUpdateNote } from "./use-update-note";

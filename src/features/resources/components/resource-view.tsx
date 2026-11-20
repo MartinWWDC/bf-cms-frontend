@@ -70,6 +70,8 @@ import type {
   BulkTarget,
   Contract,
   ExportFormat,
+  Field,
+  InlineField,
   ListAggregate,
   ListParams,
   ResourceRecord,
@@ -79,6 +81,7 @@ import type {
 import { ActionDialog, type ActionRun } from "@/components/resource/action-dialog";
 import { FieldValue } from "@/components/resource/field-value";
 import { FilterBuilder } from "./filter-builder";
+import { InlineFieldControl } from "./inline-field";
 import { StaffPicker } from "@/components/resource/pickers";
 import { NEW_RECORD, RecordDrawer, type ScreenRegistry } from "./record-drawer";
 import { SavedViewsMenu } from "./saved-views-menu";
@@ -88,6 +91,7 @@ import { SearchField } from "./search-field";
 const NO_ROWS: ResourceRecord[] = [];
 const NO_VISIBILITY: ColumnVisibilityState = {};
 const NO_TABS: ViewTab[] = [];
+const NO_INLINE: InlineField[] = [];
 const getRecordId = (record: ResourceRecord) => String(record.id);
 
 interface ResourceViewProps {
@@ -253,19 +257,62 @@ function ResourceList({ contract, viewKey, screens }: ResourceListProps) {
 
   const openRecord = useMemo(
     () => (resource: string, id: RecordId) =>
-      setState({ record: { resource: resource === contract.key ? null : resource, id: String(id) } }),
-    [contract.key, setState],
+      setState({
+        record:
+          resource === contract.key
+            ? // A record of this list opens with the detail screen of the view it was opened from.
+              { resource: null, id: String(id), view: view?.key ?? null }
+            : { resource, id: String(id) },
+      }),
+    [contract.key, view?.key, setState],
   );
+
+  /* ---------- Inline fields ---------- */
+
+  const [run, setRun] = useState<ActionRun | null>(null);
+  // An API that does not send them yet has none.
+  const inlineFields = useMemo(() => tab?.inline ?? NO_INLINE, [tab]);
+  const runInlineAction = useMemo(
+    () => (action: Action, id: RecordId, initialInput: Record<string, unknown>) =>
+      setRun({
+        resource: contract.key,
+        resourceLabel: contract.label,
+        action,
+        target: { kind: "record", id },
+        initialInput,
+      }),
+    [contract.key, contract.label, setRun],
+  );
+  const inlineCell = useMemo(() => {
+    if (inlineFields.length === 0) return undefined;
+    const byField = new Map(inlineFields.map((entry) => [entry.field, entry]));
+    return function InlineCell(field: Field, record: ResourceRecord, value: unknown) {
+      const entry = byField.get(field.name);
+      return entry ? (
+        <InlineFieldControl
+          contract={contract}
+          entry={entry}
+          field={field}
+          recordId={record.id}
+          value={value}
+          variant="cell"
+          onOpenRecord={openRecord}
+          onRunAction={runInlineAction}
+        />
+      ) : null;
+    };
+  }, [inlineFields, contract, openRecord, runInlineAction]);
 
   const columns = useMemo(() => {
     const fields = resolveFields(contract, columnNames);
-    return buildResourceColumns(fields, { onOpenRecord: openRecord });
-  }, [contract, columnNames, openRecord]);
+    return buildResourceColumns(fields, { onOpenRecord: openRecord, inlineCell });
+  }, [contract, columnNames, openRecord, inlineCell]);
 
   const tableColumns = useMemo(() => {
     if (!selectable) return columns;
     return buildResourceColumns(resolveFields(contract, columnNames), {
       onOpenRecord: openRecord,
+      inlineCell,
       selection: {
         header: () => (
           <Checkbox
@@ -288,7 +335,7 @@ function ResourceList({ contract, viewKey, screens }: ResourceListProps) {
     });
     // The checkbox cells read the selection through closures, so they follow it.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectable, columns, contract, columnNames, openRecord, allOnPage, selection, t]);
+  }, [selectable, columns, contract, columnNames, openRecord, inlineCell, allOnPage, selection, t]);
 
   const sorting = useMemo<SortingState>(() => {
     const parsed = parseSort(sort);
@@ -332,7 +379,6 @@ function ResourceList({ contract, viewKey, screens }: ResourceListProps) {
   /* ---------- Toolbar state ---------- */
 
   const [filterOpen, setFilterOpen] = useState(false);
-  const [run, setRun] = useState<ActionRun | null>(null);
   const exportRecords = useExportRecords(contract.key);
   const assignRecords = useAssignRecords(contract.key);
   const filterCount = countConditions(state.filter);
@@ -857,10 +903,15 @@ function ResourceList({ contract, viewKey, screens }: ResourceListProps) {
       />
 
       <RecordDrawer
-        open={state.record ? { resource: state.record.resource ?? contract.key, id: state.record.id } : null}
+        open={
+          state.record
+            ? { resource: state.record.resource ?? contract.key, id: state.record.id, view: state.record.view ?? null }
+            : null
+        }
         onClose={() => setState({ record: null })}
         onOpenRecord={openRecord}
         tabActions={state.record?.resource === null ? tabActionKeys.filter((key) => getAction(contract, key)) : undefined}
+        inline={state.record?.resource === null ? inlineFields : undefined}
         screens={screens}
       />
       <ActionDialog run={run} onClose={() => setRun(null)} />
